@@ -1,0 +1,31 @@
+Package: rmet2
+Type: Package
+Title: Download files and run AERMET
+Version: 0.1
+Date: 2016-05-01
+Author: James Durant
+Maintainer: James Durant to <jamesdrenda@charter.net>
+dependencies: true
+LazyData: true
+Depends:
+    R (>= 3.2.0),
+    stringr,
+    ggplot2,
+    plyr,
+    downloader,
+    tools,
+    lubridate,
+    RCurl,
+    rgdal,
+    gdata,
+    openair,
+    RadioSonde,
+    R.utils,
+    weatherData,
+    lubridate,
+    gdata
+Imports:
+Description: This packages uses R to automate the downloading of NOAA data and
+    running US EPA's AERMET system.
+License: MIT
+RoxygenNote: 5.0.1
