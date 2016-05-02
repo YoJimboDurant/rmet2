@@ -102,13 +102,13 @@ createMetProject <- function(project_Name,
     
     if(as.numeric(TD3505df$BEGIN) > as.numeric(start_Date)) 
       stop(paste("NOAA TD3505 data error: \n start_Date before BEGIN for station (", TD3505df$BEGIN, ") UTC"))
-    if(as.numeric(TD3505df$END) < as.numeric(end_Date)) 
+    if(as.numeric(as.POSIXct(TD3505df$END, tz="UTC")) < as.numeric(end_Date)) 
       stop(paste("NOAA TD3505 data error: \n end_Date after END for station (", TD3505df$END, ") UTC"))
   
   #Here we identify which files we need to download data from noaa database
-    td3505_noaa <- rmet:::checkTD3505(start_Date, end_Date, surf_USAF, surf_WBAN)
-    td6405_noaa <- rmet:::checkTD6405(start_Date, end_Date, surf_Call)
-    td6401_noaa <- rmet:::checkTD6401(start_Date, end_Date, surf_Call)
+    td3505_noaa <- rmet2:::checkTD3505(start_Date, end_Date, surf_USAF, surf_WBAN)
+    td6405_noaa <- rmet2:::checkTD6405(start_Date, end_Date, surf_Call)
+    td6401_noaa <- rmet2:::checkTD6401(start_Date, end_Date, surf_Call)
   
     
   
