@@ -46,7 +46,7 @@ createMetProject <- function(project_Name,
   
   #check if project directory exists
   if(!file.exists(project_Dir)){
-    dir.create(project_Dir)
+    dir.create(project_Dir, recursive = TRUE)
   }
   
   
@@ -56,7 +56,7 @@ createMetProject <- function(project_Name,
   lapply(seq_along(loc_years), function(i){
     theDir <-paste(project_Dir, loc_years[i], sep="/")
     if(!file.exists(theDir)){
-      dir.create(theDir)
+      dir.create(theDir, recursive = TRUE)
     }
   })
   
@@ -65,7 +65,7 @@ createMetProject <- function(project_Name,
   #create preprocessed_data directory
   prepocessed_data_dir <- paste(project_Dir, "preprocessed_data", sep="/")
   if(!file.exists(prepocessed_data_dir)){
-    dir.create(prepocessed_data_dir)
+    dir.create(prepocessed_data_dir, recursive = TRUE)
   }
   
   
@@ -79,6 +79,9 @@ createMetProject <- function(project_Name,
   start_DateUTC <- format(start_Date, "%Y%m%d", tz="UTC")
   end_DateUTC <- format(end_Date, "%Y%m%d", tz="UTC")
   
+  # fix WBAN to 5 digits
+  surf_WBAN <- sprintf("%05d",
+           as.numeric(surf_WBAN))
   
   
   #check surface station exists and is within correct dates.

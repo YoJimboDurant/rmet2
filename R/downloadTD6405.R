@@ -14,12 +14,12 @@ downloadTD6405 <- function (rmetObj, ...) {
   print("Checking if files have been downloaded")
   print(rmetObj$td6405_noaa)
   
-  loc_years <- names(nyc$td6405_noaa)
+  loc_years <- names(rmetObj$td6405_noaa)
   
     lapply(seq_along(loc_years), function(i) {
       destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
       
-        lapply(seq_along(nyc$td6405[[i]]), function(j){
+        lapply(seq_along(rmetObj$td6405[[i]]), function(j){
           destFile <- paste(destDir, gsub("^.*/", "", 
                                           rmetObj$td6405[[i]][[j]]), sep="/")
           download.file(rmetObj$td6405[[i]][[j]], destFile)

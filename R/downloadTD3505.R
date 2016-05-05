@@ -14,7 +14,7 @@ downloadTD3505 <- function (rmetObj, ...) {
   print("Checking if files have been downloaded")
   print(rmetObj$td3505_noaa)
   
-  loc_years <- names(nyc$td3505_noaa)
+  loc_years <- names(rmetObj$td3505_noaa)
   
   #UTC timezone
   if(rmetObj$surf_UTC < 0){
@@ -26,7 +26,7 @@ downloadTD3505 <- function (rmetObj, ...) {
         sourceFile2 <- rmetObj$td3505[[i]][[2]]
         fileOut2 <- readLines(con=gzcon(url(sourceFile2)))
         
-        UTC_endDate <- as.numeric(format(nyc$end_Date, "%Y%m%d%H%M", tz = "GMT"))
+        UTC_endDate <- as.numeric(format(rmetObj$end_Date, "%Y%m%d%H%M", tz = "GMT"))
         UTC_endYear <- as.numeric(paste0(as.numeric(loc_years[[i]]) + 1, "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
         
         indexDate <- ifelse(UTC_endDate < UTC_endYear, UTC_endDate, UTC_endYear)
@@ -45,7 +45,7 @@ downloadTD3505 <- function (rmetObj, ...) {
         fileOut<-readLines(con=gzcon(url(sourceFile)))
         station_ID <- substr(fileOut[[1]], 5,15)  
         
-        UTC_endDate <- as.numeric(format(nyc$end_Date, "%Y%m%d%H%M", tz = "GMT"))
+        UTC_endDate <- as.numeric(format(rmetObj$end_Date, "%Y%m%d%H%M", tz = "GMT"))
         UTC_endYear <- as.numeric(paste0(as.numeric(loc_years[[i]]) + 1, "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
         
         indexDate <- ifelse(UTC_endDate < UTC_endYear, UTC_endDate, UTC_endYear)
