@@ -114,7 +114,8 @@ createMetProject <- function(project_Name,
     td6401_noaa <- rmet2:::checkTD6401(start_Date, end_Date, surf_Call)
   
     
-  
+  #inputFiles
+    inputFiles <-list(aerminute=NULL, aersurface = NULL, aermet= NULL)
   
   aermetProject <- list(project_Name = project_Name,
                         project_Dir = project_Dir, 
@@ -128,7 +129,10 @@ createMetProject <- function(project_Name,
                         td6405_noaa = td6405_noaa,
                         td6401_noaa = td6401_noaa,
                         ua_WMO = ua_WMO,
-                        ua_UTC = ua_UTC)
+                        ua_UTC = ua_UTC,
+                        ifg = ifg,
+                        amInp = NULL,
+                        inputFiles =inputFiles)
   
   class(aermetProject) <- "rmet"
   return(aermetProject)

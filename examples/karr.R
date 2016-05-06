@@ -8,7 +8,8 @@ karr <- createMetProject(
   surf_USAF = 744655,
   surf_Call="KARR",
   ua_WMO=74560,
-  ua_UTC=0)
+  ua_UTC=0,
+  ifg = "Y 12 06 2002")
 
 downloadTD3505(karr)
 downloadTD6405(karr)
@@ -17,3 +18,8 @@ downloadTD6401(karr)
 downloadFSL(karr)
 
 
+karr <- createInput(karr, "aerminute")
+karr <- writeInputFile(karr, "aerminute")
+
+aerminute = "C:/aerminute_15272/aerminute_15272.exe"
+system(aerminute, input=paste0("\"",karr$inputFiles$aerminute[[1]],"\""))
