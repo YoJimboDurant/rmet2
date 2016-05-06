@@ -10,7 +10,7 @@
 
 downloadFSL <- function(rmetObj){
   
-  loc_years <- names(nyc$td3505_noaa)
+  loc_years <- names(rmetObj$td3505_noaa)
   require(RCurl)
   require(stringr)
 # Internet options for Windows
