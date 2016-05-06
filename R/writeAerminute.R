@@ -4,7 +4,6 @@ writeAerminute <- function(rmetObj){
   
   loc_years <- names(rmetObj$td6405_noaa)
   
-<<<<<<< HEAD
   aerminInputFiles <- lapply(seq_along(loc_years), function(i){
     
     destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
@@ -30,13 +29,6 @@ writeAerminute <- function(rmetObj){
     }
     
     aerminInp
-=======
-  lapply(seq_along(loc_years), function(i){
-    oneMinFiles <- paste(destDir, gsub("^.*/", "", 
-                                       rmetObj$td6405[[i]], sep="/"))
-    
->>>>>>> a7d9952833cf000fa332bc989f49709460a59edd
-    
   })
 
 }
