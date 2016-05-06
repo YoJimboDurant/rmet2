@@ -8,7 +8,10 @@
     rmet.desc.author = '"James Durant <hzd3@cdc.gov> [aut, cre]"',
     rmet.desc.license = "MIT",
     rmet.desc.suggests = NULL,
-    rmet.desc = list()
+    rmet.desc = list(),
+    rmet.aermet = "aermet",
+    rmet.aerminute = "aerminute",
+    rmet.aersurface = "aersurface"
   )
   toset <- !(names(op.rmet) %in% names(op))
   if(any(toset)) options(op.rmet[toset])
