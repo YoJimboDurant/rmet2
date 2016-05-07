@@ -20,6 +20,6 @@ if("aerminute" %in% type){
   })
 } 
 
-rmetObj$inputFiles$aerminute <- paste(inpFiles)
+rmetObj$inputFiles$aerminute <- prepareThePath(paste(inpFiles))
 return(rmetObj)
 }

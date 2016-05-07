@@ -21,5 +21,24 @@ downloadFSL(karr)
 karr <- createInput(karr, "aerminute")
 karr <- writeInputFile(karr, "aerminute")
 
-aerminute = "C:/aerminute_15272/aerminute_15272.exe"
-system(aerminute, input=paste0("\"",karr$inputFiles$aerminute[[1]],"\""))
+aerminute = "aerminute_15272.exe"
+
+sapply(seq_along(karr$inputFiles$aerminute), function(i) {
+  system(aerminute, input=karr$inputFiles$aerminute[[i]])
+  moveFiles <- c("aerminute.log",
+                 "bad_records.dat",
+                 "good_records.dat",
+                 "check_records.dat",
+                 "bad_records_5.dat",
+                 "good_records_5.dat",
+                 "calm_variable_records.dat"
+                 )
+  tmp <- sapply(moveFiles, function(x) file.rename(x, paste(karr$project_Dir,
+                                                      locYears(karr)[[i]], x, 
+                                                      sep="/")))
+  return(NULL)
+  }
+)
+
+
+

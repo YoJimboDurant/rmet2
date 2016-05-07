@@ -31,13 +31,14 @@ createInput.rmet <- function(rmetObj, type="aerminute"){
           endMonth <-ifelse(endYear == loc_years[[i]], 
                             format(rmetObj$end_Date, "%m"), "12")
           
+          
           ifgFlag <- rmetObj$ifg
        
           aerminInp <- gsub("!ifg!", ifgFlag, aerminInp)
           
           
-          aerminInp <- gsub("!start_Date!", paste(startMonth, startYear), aerminInp)
-          aerminInp <- gsub("!end_Date!", paste(startMonth, endYear), aerminInp)
+          aerminInp <- gsub("!start_Date!", paste(startMonth, loc_years[[i]]), aerminInp)
+          aerminInp <- gsub("!end_Date!", paste(endMonth, loc_years[[i]]), aerminInp)
           
           oneMinFiles <- path.expand(oneMinFiles)
           oneMinFiles <- paste0("\"", oneMinFiles, "\"")
@@ -54,14 +55,24 @@ createInput.rmet <- function(rmetObj, type="aerminute"){
             aerminInp <- gsub("!min5Files!", paste(path.expand(fiveMinFiles), collapse = "\n"), 
                               aerminInp)
             
-            hourFile <- paste0("AM_", "1min_", loc_years[[i]], ".dat")
-            summFile <- paste0("AM_", "1min_", loc_years[[i]], "_summ.dat")
-            compFile <- paste0("AM_", "1min_", loc_years[[i]], "_comp.dat")
+            hourFile <- paste0(destDir, "/AM_", "1min_", loc_years[[i]], ".dat")
+            summFile <- paste0(destDir, "/AM_", "1min_", loc_years[[i]], "_summ.dat")
+            compFile <- paste0(destDir, "/AM_", "1min_", loc_years[[i]], "_comp.dat")
             
-            aerminInp <- gsub("!hourfile_AM!", hourFile, aerminInp)
-            aerminInp <- gsub("!summfile_AM!", summFile, aerminInp)
-            aerminInp <- gsub("!compfile_AM!", compFile, aerminInp)
+            aerminInp <- gsub("!hourfile_AM!", prepareThePath(hourFile), aerminInp)
+            aerminInp <- gsub("!summfile_AM!", prepareThePath(summFile), aerminInp)
+            aerminInp <- gsub("!compfile_AM!", prepareThePath(compFile), aerminInp)
             
+          }
+          
+          if(!is.null(rmetObj$td3505_noaa[[i]])){
+            hourFile <- paste0(destDir, "/S", rmetObj$surf_USAF, 
+                               rmetObj$surf_WBAN,
+                                "_",loc_years[[i]], ".ISH")
+            hourFile <-prepareThePath(hourFile)
+            aerminInp <- gsub("!surfFile!", hourFile, aerminInp)
+          }else{
+            aerminInp <- gsub("!surfFile!", "", aerminInp)
           }
           
           aerminInp

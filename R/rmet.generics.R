@@ -41,6 +41,12 @@ print.rmet <- function(rmetObj){
 
 
 
+##' @export
+prepareThePath <- function(x) {
+  x <- path.expand(x)
+  x <- paste0("\"", x, "\"")
+  x
+}
 
 writeAerminute.rmet <- function(rmetObj){
   stopifnot(class(rmetObj) =="rmet")
