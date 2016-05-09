@@ -23,7 +23,6 @@ createMetProject <- function(project_Name,
                              surf_AnenometerHeight,
                              surf_UTC,
                              ifg,
-                             ifg_Call,
                              ua_WMO,
                              ua_UTC,
                              lc_File,
@@ -40,7 +39,9 @@ createMetProject <- function(project_Name,
                              as_Winter_WS,
                              as_Spring,
                              as_Summer,
-                             as_Autumn
+                             as_Autumn,
+                             as_nsector = 12,
+                             as_radius = 1
                              
                              ){
   
@@ -125,13 +126,42 @@ createMetProject <- function(project_Name,
                         surf_USAF = surf_USAF,
                         surf_Call = surf_Call,
                         surf_UTC = surf_UTC,
+                        surf_Latitude = surf_Latitude,
+                        surf_Longitude = surf_Longitude,
+                        surf_Elevation = surf_Elevation,
+                        surf_AnenometerHeight = surf_AnenometerHeight,
+                        surf_UTC = surf_UTC,
                         td3505_noaa = td3505_noaa,
                         td6405_noaa = td6405_noaa,
                         td6401_noaa = td6401_noaa,
                         ua_WMO = ua_WMO,
                         ua_UTC = ua_UTC,
                         ifg = ifg,
-                        amInp = NULL,
+                        aersurface = list(
+                          inputFiles = list(
+                            lc_File = lc_File,
+                            lc_Type = lc_Type,
+                            imp_File = imp_File,
+                            imp_Type = imp_Type,
+                            cnpy_File = cnpy_File,
+                            cnpy_Type = cnpy_Type),
+                          surfaceChar = list(
+                            as_Snow = as_Snow,
+                            as_Arid = as_Arid,
+                            as_Moisture = as_Moisture,
+                            as_Airport = as_Airport,
+                            as_nsector = 12,
+                            as_radius = 1),
+                          surfaceSeason = list(
+                        as_Winter_NS = as_Winter_NS,
+                        as_Winter_WS = as_Winter_WS,
+                        as_Spring = as_Spring,
+                        as_Summer = as_Summer,
+                        as_Autumn = as_Autumn
+                        )),
+                        inputText = list(aerminute = NULL, 
+                                         aersurface = NULL,
+                                         aermet = NULL),
                         inputFiles =inputFiles)
   
   class(aermetProject) <- "rmet"

@@ -23,7 +23,7 @@ is.rmet <- function(rmetObj, full.test=FALSE){
     
     output <- all(c("project_Name", "project_Dir", "start_Date", "end_Date", "surf_WBAN", 
                     "surf_USAF", "surf_Call", "surf_UTC", "td3505_noaa", "td6405_noaa", 
-                    "td6401_noaa", "ua_WMO", "ua_UTC", "ifg", "amInp") %in% 
+                    "td6401_noaa", "ua_WMO", "ua_UTC", "ifg", "inputText", "inputFiles") %in% 
                     names(rmetObj))
   }
   

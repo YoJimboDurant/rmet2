@@ -7,7 +7,8 @@
 
 
 
-createInput.rmet <- function(rmetObj, type="aerminute"){
+createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface")){
+ # type <- match.arg(type)
   stopifnot(class(rmetObj) =="rmet")
   
   if("aerminute" %in% type){
@@ -79,8 +80,62 @@ createInput.rmet <- function(rmetObj, type="aerminute"){
         })
         
       names(aerminInputFiles) <- loc_years
-      rmetObj$amInp <- aerminInputFiles
+      rmetObj$inputText$aerminute <- aerminInputFiles
   }
+  
+  if("aersurface" %in% type){
+  
+  
+    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_File))
+    as_inpFile <- list(
+      lcFile = prepareThePath(path.expand(rmetObj$aersurface$inputFiles$lc_File)),
+      outFile = prepareThePath(paste(path.expand(rmetObj$project_Dir), "aersurface.out", sep="/")),
+      latLon = "LATLON",
+      lat = rmetObj$surf_Latitude,
+      long = rmetObj$surf_Longitude,
+      proj = "NAD83",
+      radius = rmetObj$aersurface$surfaceChar$as_radius,
+      sector = "Y",
+      nSector = rmetObj$aersurface$surfaceChar$as_nsector,
+      timePeriod = "M",
+      asSnow=rmetObj$aersurface$surfaceChar$as_Snow,
+      asWinterNS = rmetObj$aersurface$surfaceSeason$as_Winter_NS,
+      asWinterWS = rmetObj$aersurface$surfaceSeason$as_Winter_WS,
+      asSpring = rmetObj$aersurface$surfaceSeason$as_Spring,
+      asSummer = rmetObj$aersurface$surfaceSeason$as_Summer,
+      asAutum = rmetObj$aersurface$surfaceSeason$as_Autumn,
+      airport = rmetObj$aersurface$surfaceChar$as_Airport,
+      arid = rmetObj$aersurface$surfaceChar$as_Arid,
+      asMoisture =rmetObj$aersurface$surfaceChar$as_Moisture
+    )
+    
+    if(as_inpFile$asSnow == "N") {
+      if(grepl("[[:digit:]]",as_inpFile$asWinterWS)){
+        stop(paste("AERSURFACE Option No Snow but Winter With Snow months in input file", as_inpFile$asWinterWS))
+      }
+      
+      
+      
+      as_inpFile$asWinterWS <- NULL
+    }
+    
+    if(as_inpFile$asSnow == "Y") {
+      if(!grepl("[[:digit:]]",as_inpFile$asWinterWS)){
+        stop(paste("AERSURFACE Option Yes Snow but there are no Winter With Snow months in input file", as_inpFile$asWinterWS))
+      }
+      
+      if(as_inpFile$arid == "Y"){
+        stop(paste("AERSURFACE incompatable options - Snow = Y and arid =", as_inpFile$arid))
+      }
+      
+      as_inpFile$arid <- NULL
+    }
+    
+    rmetObj$inputText$aersurface <- paste(as_inpFile, collapse="\n")
+    
+  }
+  
+
   
 return(rmetObj)
 
