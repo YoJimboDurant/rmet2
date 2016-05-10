@@ -117,4 +117,27 @@ createInput <- function(object,...)
 writeInputFile <- function(object,...)
   UseMethod("writeInputFile")
 
+##' @export
+convertLat <- function(lat){
+  stopifnot(is.numeric(lat))
+  if (lat<0){
+    lat <- paste(gsub("-", "", lat), "S", sep="")
+  }else{
+    lat <- paste(lat, "N", sep="")
+  }
+  lat
+  }
+
+
+##' @export
+convertLong <- function(long){
+  stopifnot(is.numeric(long))
+  long <- round(long, 3)
+  if (long<0){
+    long <- paste(gsub("-", "", long), "W", sep="")
+  }
+  long
+}  
+  
+
   

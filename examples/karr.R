@@ -1,6 +1,6 @@
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-  project_Dir="~/test/karr",
+  project_Dir="/RMET_WORKING/TEST/KARR",
   start_Date = lubridate::mdy_hm("01/01/2012 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("03/31/2016 23:00", tz="Etc/GMT+6"),
   surf_UTC = -6,
@@ -13,6 +13,8 @@ karr <- createMetProject(
   surf_AnenometerHeight = 8,
   ua_WMO=74560,
   ua_UTC=-6,
+  ua_Latitude = 40.15,
+  ua_Longitude = -89.15,
   ifg = "Y 12 06 2002",
   lc_File = "~/lufiles/illinois.nlcd.tif",
   lc_Type = "NLCD1992",
@@ -37,7 +39,7 @@ downloadTD6401(karr)
 downloadFSL(karr)
 
 
-karr <- createInput(karr, c("aerminute", "aersurface")) # probably should combine this into one step
+karr <- createInput(karr, c("aerminute", "aersurface", "aermet1")) # probably should combine this into one step
 karr <- writeInputFile(karr, "aerminute")
 
 

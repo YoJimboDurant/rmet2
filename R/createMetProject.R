@@ -25,6 +25,8 @@ createMetProject <- function(project_Name,
                              ifg,
                              ua_WMO,
                              ua_UTC,
+                             ua_Latitude,
+                             ua_Longitude,
                              lc_File,
                              lc_Type,
                              imp_File = NULL,
@@ -116,7 +118,8 @@ createMetProject <- function(project_Name,
   
     
   #inputFiles
-    inputFiles <-list(aerminute=NULL, aersurface = NULL, aermet= NULL)
+    inputFiles <-list(aerminute=NULL, aersurface = NULL, aermet= list(s1=NULL,s2=NULL,s3=NULL))
+    outputFiles <- list(aerminute=NULL, aersurface = NULL, aermet = list(s1=NULL,s2=NULL,s3=NULL))
   
   aermetProject <- list(project_Name = project_Name,
                         project_Dir = project_Dir, 
@@ -136,6 +139,8 @@ createMetProject <- function(project_Name,
                         td6401_noaa = td6401_noaa,
                         ua_WMO = ua_WMO,
                         ua_UTC = ua_UTC,
+                        ua_Latitude = ua_Latitude,
+                        ua_Longitude = ua_Longitude,
                         ifg = ifg,
                         aersurface = list(
                           inputFiles = list(
@@ -162,7 +167,9 @@ createMetProject <- function(project_Name,
                         inputText = list(aerminute = NULL, 
                                          aersurface = NULL,
                                          aermet = NULL),
-                        inputFiles =inputFiles)
+                        inputFiles =inputFiles,
+                        outputFiles = outputFiles)
+  
   
   class(aermetProject) <- "rmet"
   return(aermetProject)
