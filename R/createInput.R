@@ -99,6 +99,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface")){
       nSector = rmetObj$aersurface$surfaceChar$as_nsector,
       timePeriod = "M",
       asSnow=rmetObj$aersurface$surfaceChar$as_Snow,
+      specify = "Y",
       asWinterNS = rmetObj$aersurface$surfaceSeason$as_Winter_NS,
       asWinterWS = rmetObj$aersurface$surfaceSeason$as_Winter_WS,
       asSpring = rmetObj$aersurface$surfaceSeason$as_Spring,
