@@ -30,6 +30,8 @@ downloadTD3505 <- function (rmetObj, ...) {
         UTC_endYear <- as.numeric(paste0(as.numeric(loc_years[[i]]) + 1, "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
         
         indexDate <- ifelse(UTC_endDate < UTC_endYear, UTC_endDate, UTC_endYear)
+        #indexDate <- indexDate + 0000000100
+        print(as.character(indexDate))
         indX <-  as.numeric(substring(fileOut2, 16,27)) <= indexDate
      
         fileOut2 <-fileOut2[indX]

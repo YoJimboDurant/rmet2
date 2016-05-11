@@ -155,7 +155,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
     ishqaoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "SFQAOUT.DAT", sep="/")
     destDir <- paste(path.expand(rmetObj$project_Dir), loc_years, sep="/")
     sxDates <- paste0(loc_years,"/1/1")
-    exDates <- paste0(loc_years,"/12/31")
+    exDates <- paste0(as.numeric(loc_years)+1,"/1/1")
     
     sxDates[[1]] <- paste(loc_years[[1]], 
                           as.numeric(format(rmetObj$start_Date, "%m")),
@@ -189,7 +189,8 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
         "SURFACE",
         paste("**          Surface air data for WBAN:",
               rmetObj$surf_WBAN ,"ISHD format"),
-        paste0("  EXTRACT       ", prepareThePath(ishFiles[[i]])),
+        paste0("  DATA       ", prepareThePath(ishFiles[[i]])," ISHD"),
+        paste0("  EXTRACT    ", prepareThePath(paste(destDir[[i]],"SFEXOUT.DAT",sep="/"))),
         "  AUDIT          SLVP PRES CLHT TSKC PWTH ASKY HZVS RHUM",
         "  RANGE TMPD  -300  <=  450  999",
         paste0("  XDATES        ", xdates[[i]]),

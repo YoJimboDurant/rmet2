@@ -1,6 +1,6 @@
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-  project_Dir="/RMET_WORKING/TEST/KARR",
+  project_Dir="~/TEST/KARR",
   start_Date = lubridate::mdy_hm("01/01/2012 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("03/31/2016 23:00", tz="Etc/GMT+6"),
   surf_UTC = -6,
@@ -31,7 +31,7 @@ karr <- createMetProject(
   as_Spring ="3 4 5",
   as_Summer = "6 7 8",
   as_Autumn = "9 10 11")
-
+ 
 
 downloadTD3505(karr) # could combine into one step
 downloadTD6405(karr)
