@@ -1,6 +1,8 @@
+installAM(aermetExists=rep(TRUE,3))
+
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-  project_Dir="/RMET_WORKING/TEST/KARR",
+  project_Dir="~/test/karr",
   start_Date = lubridate::mdy_hm("01/01/2012 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("03/31/2016 23:00", tz="Etc/GMT+6"),
   surf_UTC = -6,
@@ -27,10 +29,10 @@ karr <- createMetProject(
   as_Moisture = "A",
   as_Airport = "Y",
   as_Winter_NS ="",
-  as_Winter_WS = "12 1 2",
-  as_Spring ="3 4 5",
+  as_Winter_WS = "11 12 1 2 3",
+  as_Spring ="4 5",
   as_Summer = "6 7 8",
-  as_Autumn = "9 10 11")
+  as_Autumn = "9 10")
  
 
 downloadTD3505(karr) # could combine into one step
@@ -39,14 +41,14 @@ downloadTD6401(karr)
 downloadFSL(karr)
 
 
-karr <- createInput(karr, c("aerminute", "aersurface", "aermet1")) # probably should combine this into one step
-karr <- writeInputFile(karr, "aerminute")
+karr <- createInput(karr) # probably should combine this into one step
+karr <- writeInputFile(karr, c("aerminute", "aersurface"))
 
 
 # protofunction to execute aerminute_exe
-aerminute = "C:/aerminute_15272/aerminute_15272.exe"
+
 sapply(seq_along(karr$inputFiles$aerminute), function(i) {
-  system(aerminute, input=karr$inputFiles$aerminute[[i]])
+  system(getOption("aerminute"), input=karr$inputFiles$aerminute[[i]])
   moveFiles <- c("aerminute.log",
                  "bad_records.dat",
                  "good_records.dat",
@@ -62,5 +64,90 @@ sapply(seq_along(karr$inputFiles$aerminute), function(i) {
   }
 )
 
+# protofunction of execution of aersurface
+
+
+
+karr <- writeInputFile(karr, "aersurface", dewinter=TRUE)
+
+system(getOption("aersurface"), 
+       input=readLines(karr$inputFiles$aersurface[grepl("aersurface.inp", 
+                                                        karr$inputFiles$aersurface)]))
+
+
+system(getOption("aersurface"), 
+       input=readLines(karr$inputFiles$aersurface[grepl("aersurface_dewinter.inp", 
+                                                        karr$inputFiles$aersurface)]))
+
+
+#rnoaa to look at snow cover
+library(rnoaa)
+x <- ncdc_stations(datatypeid='mly-snwd-avgnds-ge001wi', locationid = 'FIPS:17089')
+print(x$data[c("name","id","mindate","maxdate")])
+
+
+snowjobs <- lapply(x$data$id, function(x){
+  ncdc(datasetid = "NORMAL_MLY", datatypeid = "mly-snwd-avgnds-ge001wi", 
+                 stationid = x,
+                 startdate = "2010-01-01", 
+                 enddate="2010-12-31", limit=365)
+}
+)
+
+
+snowjobs <- lapply(snowjobs, function(x) {
+  x$data$value[x$data$value == -7777] <- 0
+  x$data$value[x$data$value == -9999] <- NA
+  x$data$value <- x$data$value/10
+  return(x)
+})
+
+snowjobs <- Reduce(function(...) ncdc_combine(...), snowjobs)
+
+ggplot(snowjobs$data, aes(x=date, y=value, shape=station, group=station)) + 
+  geom_point(size=4) + geom_line() + xlab("Date") + ylab("Days with > 1 inch Snow Cover") +
+  theme_light()
+
+# metoerologist sources tupical 1 inch of cover 43 days/snow season
+# http://chicagoweathercenter.com/blog/ask_tom_why_more_days_with_snow_cover_or_without_in_a_typical_chicago_winter
+
+ddply(snowjobs$data, .(station), summarize, total = sum(value))
+
+#looks reasonable.
+
+snowjobs$data$value <- snowjobs$data$value/30.4
+
+snowcover <- ddply(snowjobs$data, .(date), summarize, snowMean = round(mean(value),2))
+
+snowcover$snowMean[snowcover$snowMean<0.01] <- 0
+snowcover$month <- 1:12
+
+
+
+asFiles <- gsub("[.]inp", ".out", karr$inputFiles$aersurface)
+
+asData <- lapply(asFiles, function(x) {
+  dfx <- read.table(x, skip=30)
+  names(dfx) <- c("SITE_CHAR", "Month", "Sect", "Alb", "Bo", "Zo")
+  return(dfx)
+  })
+
+names(asData) <- gsub(".*/", "", asFiles)
+
+#winter
+asData[[which(names(asData) == "aersurface.out")]][c("Alb","Bo", "Zo")] <- 
+asData[[which(names(asData) == "aersurface.out")]][c("Alb","Bo", "Zo")] * 
+  rep(snowcover$snowMean, each=12)
+
+asData[[which(names(asData) == "aersurface_dewinter.out")]][c("Alb","Bo", "Zo")] <- 
+  asData[[which(names(asData) == "aersurface_dewinter.out")]][c("Alb","Bo", "Zo")] * 
+  rep(1-snowcover$snowMean, each=12)
+
+asData$adjusted_aersurface.data <- data.frame(SITE_CHAR="SITE_CHAR", Month=asData[[1]]$Month, 
+                                              Sect=asData[[1]]$Sect, Alb=NA, Bo=NA, Zo=NA)
+  
+asData$adjusted_aersurface.data[c("Alb","Bo", "Zo")] <- asData[[which(names(asData) == "aersurface_dewinter.out")]][c("Alb","Bo", "Zo")] +
+  asData[[which(names(asData) == "aersurface.out")]][c("Alb","Bo", "Zo")]
+  
 
 

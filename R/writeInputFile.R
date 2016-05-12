@@ -6,10 +6,10 @@
 #' @export
 
 
-writeInputFile.rmet <- function(rmetObj, type="aerminute"){
+writeInputFile.rmet <- function(rmetObj, type=c("aerminute", "aersurface"), dewinter = FALSE){
 stopifnot(is.rmet(rmetObj))
 stopifnot(class(type) == "character")
-
+stopifnot(type %in% c("aerminute", "aersurface"))
 loc_years <- locYears(rmetObj)
 
 if("aerminute" %in% type){
@@ -18,8 +18,32 @@ if("aerminute" %in% type){
     write(rmetObj$inputText$aerminute[[i]], file= inpFile)
     path.expand(inpFile)
   })
-} 
+  rmetObj$inputFiles$aerminute <- prepareThePath(paste(inpFiles))
+  
+}
 
-rmetObj$inputFiles$aerminute <- prepareThePath(paste(inpFiles))
+if("aersurface" %in% type){
+    inpFile <- paste(rmetObj$project_Dir, "aersurface/aersurface.inp", sep="/")
+    write(rmetObj$inputText$aersurface, file= inpFile)
+    inpFile <- path.expand(inpFile)
+    rmetObj$inputFiles$aersurface <- inpFile
+   
+    if(dewinter){
+      inpFile <- paste(rmetObj$project_Dir, "aersurface/aersurface_dewinter.inp", sep="/")
+      newObj <- rmetObj
+      newObj$aersurface$surfaceSeason$as_Winter_NS <- paste(karr$aersurface$surfaceSeason$as_Winter_WS, karr$aersurface$surfaceSeason$as_Winter_NS)
+      newObj$aersurface$surfaceSeason$as_Winter_WS <- NULL
+      newObj$aersurface$surfaceChar$as_Snow <- "N"
+      newObj <- createInput(newObj, "aersurface")
+      newObj$inputText$aersurface <- gsub("aersurface.out", "aersurface_dewinter.out", newObj$inputText$aersurface)
+      write(newObj$inputText$aersurface, file= inpFile)
+      inpFile <- path.expand(inpFile)
+      rmetObj$inputFiles$aersurface <- c(rmetObj$inputFiles$aersurface, inpFile)
+      
+    }
+  }
+
+
 return(rmetObj)
+
 }

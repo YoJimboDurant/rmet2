@@ -168,7 +168,7 @@ createMetProject <- function(project_Name,
                                          aersurface = NULL,
                                          aermet = NULL),
                         inputFiles =inputFiles,
-                        outputFiles = outputFiles)
+                        output = outputFiles)
   
   
   class(aermetProject) <- "rmet"
