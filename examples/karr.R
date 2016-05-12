@@ -1,8 +1,19 @@
-installAM(aermetExists=rep(TRUE,3))
+library(rmet2)
 
+#windows intaller for binaries:
+#installAM(aermetExists=rep(TRUE,3))
+
+#real programmers use Linux (or at least try to)
+options(aerminute  =  "aerminute_15272.exe")
+options(aermet = "aermet")
+options(aersurface = "aersurface")
+
+
+#create object
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-  project_Dir="~/test/karr",
+#  project_Dir="~/test/karr",
+  project_Dir="/RMET_WORKING/TEST/KARR",
   start_Date = lubridate::mdy_hm("01/01/2012 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("03/31/2016 23:00", tz="Etc/GMT+6"),
   surf_UTC = -6,
