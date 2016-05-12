@@ -1,6 +1,6 @@
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-  project_Dir="~/TEST/KARR",
+  project_Dir="/RMET_WORKING/TEST/KARR",
   start_Date = lubridate::mdy_hm("01/01/2012 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("03/31/2016 23:00", tz="Etc/GMT+6"),
   surf_UTC = -6,

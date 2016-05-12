@@ -14,7 +14,7 @@ downloadTD3505 <- function (rmetObj, ...) {
   print("Checking if files have been downloaded")
   print(rmetObj$td3505_noaa)
   
-  loc_years <- names(rmetObj$td3505_noaa)
+  loc_years <- locYears(rmetObj)
   
   #UTC timezone
   if(rmetObj$surf_UTC < 0){
@@ -29,6 +29,9 @@ downloadTD3505 <- function (rmetObj, ...) {
         UTC_endDate <- as.numeric(format(rmetObj$end_Date, "%Y%m%d%H%M", tz = "GMT"))
         UTC_endYear <- as.numeric(paste0(as.numeric(loc_years[[i]]) + 1, "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
         
+        UTC_startDate <- as.numeric(format(rmetObj$start_Date, "%Y%m%d%H%M", tz = "GMT"))
+        UTC_startYear <- as.numeric(paste0(as.numeric(loc_years[[i]]), "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
+        
         indexDate <- ifelse(UTC_endDate < UTC_endYear, UTC_endDate, UTC_endYear)
         #indexDate <- indexDate + 0000000100
         print(as.character(indexDate))
@@ -36,6 +39,10 @@ downloadTD3505 <- function (rmetObj, ...) {
      
         fileOut2 <-fileOut2[indX]
         fileOut <- c(fileOut, fileOut2)
+        
+        indexDate <- ifelse(UTC_startDate > UTC_startYear, UTC_startDate, UTC_startYear)
+        indX <-  as.numeric(substring(fileOut, 16,27)) >= indexDate
+        fileOut <- fileOut[indX]
 
         station_ID <- substr(fileOut[[1]], 5,15)        
         yearDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
