@@ -157,8 +157,42 @@ asData[[which(names(asData) == "aersurface_dewinter.out")]][c("Alb","Bo", "Zo")]
 asData$adjusted_aersurface.data <- data.frame(SITE_CHAR="SITE_CHAR", Month=asData[[1]]$Month, 
                                               Sect=asData[[1]]$Sect, Alb=NA, Bo=NA, Zo=NA)
   
-asData$adjusted_aersurface.data[c("Alb","Bo", "Zo")] <- asData[[which(names(asData) == "aersurface_dewinter.out")]][c("Alb","Bo", "Zo")] +
-  asData[[which(names(asData) == "aersurface.out")]][c("Alb","Bo", "Zo")]
+asData$adjusted_aersurface.data[c("Alb","Bo", "Zo")] <- asData[[which(names(asData) == "aersurface_dewinter.out")]][c("Alb","Bo", "Zo")]  +
+  asData[[which(names(asData) == "aersurface.out")]][c("Alb","Bo", "Zo")] 
   
 
+
+
+headAersurf <- readLines(asFiles[[1]], n=30)
+headAersurf[[grep("\\*\\* Autumn with unharvested cropland:", 
+                  headAersurf)+1]] <- "** Modifed by for number snow cover >1/month based on climate normals"
+
+surfLines <- paste("  ", asData$adjusted_aersurface.data$SITE_CHAR, "  ", 
+      format(asData$adjusted_aersurface.data$Month, digits=2, just="right"),
+      "    ", format(asData$adjusted_aersurface.data$Sect, digits=2, just="right"), 
+      "   ", sprintf("%1.2f", asData$adjusted_aersurface.data$Alb), "   ",
+      sprintf("%1.2f", asData$adjusted_aersurface.data$Bo), "   ",
+      sprintf("%1.3f", asData$adjusted_aersurface.data$Zo))
+
+karr$output$aersurface <-paste(c(headAersurf, surfLines), collapse=
+                                 "\n")
+write(karr$output$aersurface, file = paste(karr$project_Dir,"aersurface", "adjust_aersurface.out", sep="/"))
+
+
+# Write S1, S2 and S3 input files and run. --------------------------------
+
+lapply(karr$inputText$aermet$s1, function(x) {
+  write(x, file="AERMET.INP")
+  system(getOption("aermet"))
+})
+
+lapply(karr$inputText$aermet$s2, function(x) {
+  write(x, file="AERMET.INP")
+  system(getOption("aermet"))
+})
+
+lapply(seq_along(karr$inputText$aermet$s3), function(i) {
+  write(c(karr$inputText$aermet$s3[[i]], karr$output$aersurface), file="AERMET.INP")
+  system(getOption("aermet"))
+})
 

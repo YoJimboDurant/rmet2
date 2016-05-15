@@ -63,6 +63,9 @@ createMetProject <- function(project_Name,
     }
   })
   
+  #aersurface working directory
+  dir.create(paste(project_Dir,"aersurface", sep="/"), recursive = TRUE)
+  
  # R packages that use S3 method
   
   #create preprocessed_data directory

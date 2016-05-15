@@ -87,9 +87,9 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
             aerminInp <- gsub("!min5Files!", paste(path.expand(fiveMinFiles), collapse = "\n"), 
                               aerminInp)
           }  
-            hourFile <- prepareThePath(paste0(destDir, "/AM_", "1min_", loc_years[[i]], ".dat"))
-            summFile <- prepareThePath(paste0(destDir, "/AM_", "1min_", loc_years[[i]], "_summ.dat"))
-            compFile <- prepareThePath(paste0(destDir, "/AM_", "1min_", loc_years[[i]], "_comp.dat"))
+            hourFile <- prepareThePath(paste0(destDir, "/AM_", "1MIN_", loc_years[[i]], ".DAT"))
+            summFile <- prepareThePath(paste0(destDir, "/AM_", "1MIN_", loc_years[[i]], "_summ.DAT"))
+            compFile <- prepareThePath(paste0(destDir, "/AM_", "1MIN_", loc_years[[i]], "_comp.DAT"))
             
             aerminInp <- gsub("!hourfile_AM!", hourFile, aerminInp)
             aerminInp <- gsub("!summfile_AM!", summFile, aerminInp)
@@ -116,7 +116,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
       
       rmetObj$outputFiles$aerminute <- sapply(seq_along(loc_years), function(i){
         destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
-        paste0(destDir, "/AM_", "1min_", loc_years[[i]], ".dat")
+        paste0(destDir, "/AM_", "1MIN_", loc_years[[i]], ".DAT")
       }
         )
   }
@@ -246,15 +246,15 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
           "**",
            paste0("  QAOUT        ", prepareThePath(ishqaoutFiles[[i]])),
           if(length(rmetObj$td6405_noaa) > 0 | length(rmetObj$td6401_noaa) > 0){
-           paste0("  ASOS1MIN        ", prepareThePath(paste0(destDir[[i]], "/AM_", "1min_", 
-                                                              loc_years[[i]], ".dat")))
+           paste0("  ASOS1MIN        ", prepareThePath(paste0(destDir[[i]], "/AM_", "1MIN_", 
+                                                              loc_years[[i]], ".DAT")))
           }
           
         ),
         MERGE = list(
           "MERGE",
           "**",
-          paste0("  OUTPUT        ", prepareThePath(paste(destDir[[i]], "/AMS2_ISHD.MRG"))),
+          paste0("  OUTPUT        ", prepareThePath(paste0(destDir[[i]], "/AMS2_ISHD.MRG"))),
           paste0("  XDATES        ", xdates2[[i]])
           
         )
@@ -289,10 +289,10 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
           "  METHOD   WIND_DIR  RANDOM",
           if(ustar) {"  METHOD   STABLEBL ADJ_U*"
           },
-          paste0("  NWS_HEIGHT    ", "WIND ", rmetObj$surf_AnenometerHeight),
+          paste0("  NWS_HGT    ", "WIND ", rmetObj$surf_AnenometerHeight),
           paste0("  OUTPUT        ", prepareThePath(paste(destDir[[i]], paste0("AM_",loc_years[[i]],".SFC"),
                                                           sep="/"))),
-          paste0("  OUTPUT        ", prepareThePath(paste(destDir[[i]], paste0("AM_",loc_years[[i]],".PFL"),
+          paste0("  PROFILE        ", prepareThePath(paste(destDir[[i]], paste0("AM_",loc_years[[i]],".PFL"),
                                                           sep="/")))
         )
       )

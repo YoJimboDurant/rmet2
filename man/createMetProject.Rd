@@ -6,10 +6,11 @@
 \usage{
 createMetProject(project_Name, project_Dir, start_Date, end_Date, surf_WBAN,
   surf_USAF, surf_Call, surf_Latitude, surf_Longitude, surf_Elevation,
-  surf_AnenometerHeight, surf_UTC, ifg, ifg_Call, ua_WMO, ua_UTC, lc_File,
-  lc_Type, imp_File = NULL, imp_Type = NULL, cnpy_File = NULL,
-  cnpy_Type = NULL, as_Snow, as_Arid, as_Moisture, as_Airport, as_Winter_NS,
-  as_Winter_WS, as_Spring, as_Summer, as_Autumn)
+  surf_AnenometerHeight, surf_UTC, ifg, ua_WMO, ua_UTC, ua_Latitude,
+  ua_Longitude, lc_File, lc_Type, imp_File = NULL, imp_Type = NULL,
+  cnpy_File = NULL, cnpy_Type = NULL, as_Snow, as_Arid, as_Moisture,
+  as_Airport, as_Winter_NS, as_Winter_WS, as_Spring, as_Summer, as_Autumn,
+  as_nsector = 12, as_radius = 1)
 }
 \description{
 \code{createMetProject} Creates basic aermet project, specifying 
