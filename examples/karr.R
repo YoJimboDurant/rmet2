@@ -1,21 +1,21 @@
 library(rmet2)
 
 #windows intaller for binaries:
-#installAM(aermetExists=rep(TRUE,3))
+installAM(aermetExists=rep(TRUE,3))
 
 #real programmers use Linux (or at least try to)
-options(aerminute  =  "aerminute_15272.exe")
-options(aermet = "aermet")
-options(aersurface = "aersurface")
+# options(aerminute  =  "aerminute_15272.exe")
+# options(aermet = "aermet")
+# options(aersurface = "aersurface")
 
 
 #create object
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-#  project_Dir="~/test/karr",
-  project_Dir="/RMET_WORKING/TEST/KARR",
-  start_Date = lubridate::mdy_hm("01/01/2012 00:00", tz="Etc/GMT+6"),
-  end_Date = lubridate::mdy_hm("03/31/2016 23:00", tz="Etc/GMT+6"),
+   project_Dir="~/test/karr",
+#  project_Dir="/RMET_WORKING/TEST/KARR",
+  start_Date = lubridate::mdy_hm("01/01/2011 00:00", tz="Etc/GMT+6"),
+  end_Date = lubridate::mdy_hm("12/31/2015 23:00", tz="Etc/GMT+6"),
   surf_UTC = -6,
   surf_WBAN = 04808,
   surf_USAF = 744655,
@@ -75,8 +75,15 @@ sapply(seq_along(karr$inputFiles$aerminute), function(i) {
   }
 )
 
-# protofunction of execution of aersurface
 
+
+# protofunction of execution of aersurface
+# Since R5 guidance requires averaging snowcover and non-snowcover
+# albedo bowen ratio and surface roughness by number of 
+# snow cover days per month, we need to run twice
+# then use rnoaa to get the number of snow cover >1" for
+# county, then write the AERSURFACE parameters into
+# object to be used in S3 processing in AERMET.
 
 
 karr <- writeInputFile(karr, "aersurface", dewinter=TRUE)
@@ -92,6 +99,9 @@ system(getOption("aersurface"),
 
 
 #rnoaa to look at snow cover
+# note that you need to request a apikey from noaa 
+# (see https://github.com/ropensci/rnoaa  - see section NCDC Authentication)
+
 library(rnoaa)
 x <- ncdc_stations(datatypeid='mly-snwd-avgnds-ge001wi', locationid = 'FIPS:17089')
 print(x$data[c("name","id","mindate","maxdate")])
@@ -195,4 +205,9 @@ lapply(seq_along(karr$inputText$aermet$s3), function(i) {
   write(c(karr$inputText$aermet$s3[[i]], karr$output$aersurface), file="AERMET.INP")
   system(getOption("aermet"))
 })
+
+# Make final surface and profile files ------------------------------------
+
+makeFinal(karr)
+surfCheck(karr)
 
