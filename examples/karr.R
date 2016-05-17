@@ -208,6 +208,6 @@ lapply(seq_along(karr$inputText$aermet$s3), function(i) {
 
 # Make final surface and profile files ------------------------------------
 
-makeFinal(karr)
-surfCheck(karr)
+makeFinal.rmet(karr, outfile = "karr20112015")
+surfCheck(karr, outfile = "karr20112015")
 
