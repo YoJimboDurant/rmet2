@@ -14,6 +14,8 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
   stopifnot(all(type %in% c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3")))
   loc_years <- locYears(rmetObj)
   
+  xtz <- lubridate::tz(rmetObj$start_Date)
+  
   fslFiles <- paste(path.expand(rmetObj$project_Dir), "/", loc_years,"/", rmetObj$ua_WMO,".FSL", sep="")
   uaexoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAEXOUT.DAT", sep="/")
   uaqaoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAQAOUT.DAT", sep="/")
@@ -21,22 +23,26 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
   ishFiles <- paste0(path.expand(rmetObj$project_Dir), "/", loc_years,"/","S",stationID,"_",loc_years, ".ISH")
   ishqaoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "SFQAOUT.DAT", sep="/")
   destDir <- paste(path.expand(rmetObj$project_Dir), loc_years, sep="/")
-  sxDates <- paste0(loc_years,"/1/1")
+  sxDates2 <- sxDates <- paste0(loc_years,"/1/1")
+
   exDates <- paste0(as.numeric(loc_years)+1,"/1/1")
-  
   exDates2 <- paste0(as.numeric(loc_years),"/12/31")
   
-  sxDates[[1]] <- paste(loc_years[[1]], 
-                        as.numeric(format(rmetObj$start_Date, "%m")),
-                        as.numeric(format(rmetObj$start_Date, "%d")), sep="/")
+  sxDates[[1]] <- paste(format(rmetObj$start_Date, "%Y", tz="UTC"), 
+                        as.numeric(format(rmetObj$start_Date, "%m", tz="UTC")),
+                        as.numeric(format(rmetObj$start_Date, "%d", tz="UTC")), sep="/")
   
-  exDates[[length(exDates)]] <- paste(loc_years[[length(loc_years)]], 
-                                      as.numeric(format(rmetObj$end_Date, "%m")),
-                                      as.numeric(format(rmetObj$end_Date, "%d")), sep="/")
+  sxDates2[[1]] <- paste(format(rmetObj$start_Date, "%Y", tz=xtz), 
+                        as.numeric(format(rmetObj$start_Date, "%m", tz=xtz)),
+                        as.numeric(format(rmetObj$start_Date, "%d", tz=xtz)), sep="/")
   
-  exDates2[[length(exDates2)]] <- paste(loc_years[[length(loc_years)]], 
-                                        as.numeric(format(rmetObj$end_Date, "%m")),
-                                        as.numeric(format(rmetObj$end_Date, "%d")), sep="/")
+  exDates[[length(exDates)]] <- paste(as.numeric(format(rmetObj$end_Date, "%Y", tz="UTC")), 
+                                      as.numeric(format(rmetObj$end_Date, "%m", tz="UTC")),
+                                      as.numeric(format(rmetObj$end_Date, "%d", tz="UTC")), sep="/")
+  
+  exDates2[[length(exDates2)]] <- paste(as.numeric(format(rmetObj$end_Date, "%Y", tz=xtz)), 
+                                        as.numeric(format(rmetObj$end_Date, "%m", tz=xtz)),
+                                        as.numeric(format(rmetObj$end_Date, "%d", tz=xtz)), sep="/")
   
   
   xdates <- paste(sxDates,exDates, sep=" TO ")
