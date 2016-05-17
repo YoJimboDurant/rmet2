@@ -5,12 +5,17 @@
 checkTD6405 <- function(start_Date, end_Date,  surf_Call){
   noaaSite <- getOption("rmet.noaa.site")
   noaaSite <- paste0(noaaSite, "asos-onemin/")
-  startYear <- as.numeric(format(start_Date, "%Y", tz="UTC"))
-  endYear <- as.numeric(format(end_Date, "%Y", tz="UTC"))
+
+  xtz <- lubridate::tz(start_Date)
+  startYear <- as.numeric(format(start_Date, "%Y", tz=xtz))
+  endYear <- as.numeric(format(end_Date, "%Y", tz=xtz))
   stopifnot(endYear>startYear)
   
-  months <- format(seq.Date(as.Date(start_Date), as.Date(end_Date), "month"),"%m")
-  years <- format(seq.Date(as.Date(start_Date), as.Date(end_Date), "month"),"%Y")  
+  
+  
+  locDates <- seq.Date(as.Date(start_Date, tz=xtz), as.Date(end_Date, tz=xtz), by = "month")
+  months <- format(locDates, "%m",tz=xtz)
+  years <- format(locDates, "%Y", tz=xtz)  
   fileName <- sapply(seq_along(years), function(i){
     paste0(
       noaaSite, "6405-", years[i], "/", "64050", surf_Call,  years[i], months[i],

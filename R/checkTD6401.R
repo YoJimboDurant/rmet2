@@ -10,7 +10,7 @@ checkTD6401 <- function(start_Date, end_Date,  surf_Call){
   endYear <- as.numeric(format(end_Date, "%Y", tz=xtz))
   stopifnot(endYear>startYear)
   
-  locDates <- seq.Date(as.Date(start_Date, tz=xtz), as.Date(end_Date, tz=xtz), by = 1)
+  locDates <- seq.Date(as.Date(start_Date, tz=xtz), as.Date(end_Date, tz=xtz), by = "month")
   months <- format(locDates, "%m",tz=xtz)
   years <- format(locDates, "%Y", tz=xtz)  
   fileName <- sapply(seq_along(years), function(i){
