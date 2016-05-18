@@ -49,7 +49,7 @@ createMetProject <- function(project_Name,
   
   #check if project directory exists
   if(!file.exists(project_Dir)){
-    dir.create(project_Dir, recursive = TRUE)
+    dir.create(project_Dir, recursive = FALSE)
   }
   
   
@@ -59,19 +59,19 @@ createMetProject <- function(project_Name,
   lapply(seq_along(loc_years), function(i){
     theDir <-paste(project_Dir, loc_years[i], sep="/")
     if(!file.exists(theDir)){
-      dir.create(theDir, recursive = TRUE)
+      dir.create(theDir, recursive = FALSE)
     }
   })
   
   #aersurface working directory
-  dir.create(paste(project_Dir,"aersurface", sep="/"), recursive = TRUE)
+  dir.create(paste(project_Dir,"aersurface", sep="/"), recursive = FALSE)
   
  # R packages that use S3 method
   
   #create preprocessed_data directory
   prepocessed_data_dir <- paste(project_Dir, "preprocessed_data", sep="/")
   if(!file.exists(prepocessed_data_dir)){
-    dir.create(prepocessed_data_dir, recursive = TRUE)
+    dir.create(prepocessed_data_dir, recursive = FALSE)
   }
   
   
