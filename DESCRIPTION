@@ -23,7 +23,10 @@ Depends:
     R.utils,
     weatherData,
     lubridate,
-    gdata
+    gdata,
+    sp,
+    leaflet,
+    geosphere
 Imports:
 Description: This packages uses R to automate the downloading of NOAA data and
     running US EPA's AERMET system.
