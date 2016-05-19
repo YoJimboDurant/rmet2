@@ -16,7 +16,24 @@
   toset <- !(names(op.rmet) %in% names(op))
   if(any(toset)) options(op.rmet[toset])
   assign("rmetData", new.env(hash = TRUE), envir = .GlobalEnv) 
-  assign("surf_Hist", readLines(getOption("rmet.noaa.surfhist")), envir = rmetData)
+  
+  # Read surface station history file and parse each variable
+  surfhist <- readLines("http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt")
+  surfhist <- surfhist[23:length(surfhist)]
+  surfhist <- sapply(surfhist,substring,
+                     c(1,8,14,44,49,52,58,66,75,83,92),
+                     c(7,13,43,48,51,57,65,74,82,91,99),
+                     USE.NAMES = FALSE)
+  surfhist <- t(surfhist)
+  surfhist <- as.data.frame(surfhist,stringsAsFactors = FALSE)
+  names(surfhist) <- c("USAF","WBAN","STATION_NAME","CTRY","ST",
+                       "CALL","LAT","LON","ELEV","BEGIN","END")
+  
+  # Change variable types
+  surfhist$LAT <- as.numeric(surfhist$LAT)
+  surfhist$LON <- as.numeric(surfhist$LON)
+  
+  assign("surfhist", surfhist, envir = rmetData)
   invisible()
 }
 

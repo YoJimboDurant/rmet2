@@ -8,12 +8,13 @@
 #' 
 #' @param site a character string that can be geocoded by the Google Maps API.
 #' For example, "30341", "4770 Buford Hwy. Atlanta GA 30341", and "CDC".
-#' @param farthest a numeric value in meters that determine the farthest station to be mapped from the \code{site} If no value is specified a defalt value of 25,000 meters is used.
+#' @param farthest a numeric value in meters that determine the farthest station
+#' to be mapped from the \code{site} If no value is specified a defalt value
+#' of 25,000 meters is used.
 
 #' @export
 mapstation <- function(site,farthest=25000) {
-  #stations <- readLines("http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt")
-  stations <- read.csv("input.csv")
+  stations <- get("surfhist", envir=rmetData)
 
   # Remove stations without longitude/latitude
   stations <- stations[!is.na(stations$LAT),]
@@ -26,10 +27,7 @@ mapstation <- function(site,farthest=25000) {
   
   # Get coord of point of interest
   coord <- ggmap::geocode(site)
-  
-  
-  #as.matrix(stations[,c("LON","LAT")])
-  
+
   #Calculate distance between site and stations
   aaa <- geosphere::distm(as.matrix(coord),as.matrix(stations[,c("LON","LAT")]))
   stations$dist <- as.vector(aaa)
@@ -38,8 +36,13 @@ mapstation <- function(site,farthest=25000) {
   stations <- stations[stations$dist<farthest,]
   
   pts <- cbind(stations$LON,stations$LAT)
-  bbb <- sp::SpatialPointsDataFrame(pts,stations)
+  sdf <- sp::SpatialPointsDataFrame(pts,stations)
+  sdf$label <- paste(sdf$STATION_NAME,sdf$CTRY,sdf$dist,sep="<br>")
+  
 
-  map <- leaflet::leaflet(bbb) %>% addTiles() %>% addMarkers(popup=~STATION_NAME) %>% addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+  map <- leaflet::leaflet(sdf) %>%
+    addTiles() %>%
+    addMarkers(popup=~label) %>%
+    addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
   map
 }
