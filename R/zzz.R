@@ -18,7 +18,7 @@
   assign("rmetData", new.env(hash = TRUE), envir = .GlobalEnv) 
   
   # Read surface station history file and parse each variable
-  surfhist <- readLines(getOption("rmet.noaa.surfhist"))
+  surfhist <- readLines("http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt")
   surfhist <- surfhist[23:length(surfhist)]
   surfhist <- sapply(surfhist,substring,
                      c(1,8,14,44,49,52,58,66,75,83,92),
