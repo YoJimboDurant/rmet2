@@ -67,7 +67,7 @@ surfCheck <- function(rmetObj, outfile="surfaceFile.pdf", file.choose=FALSE,
   
 
   else{
-    fileName <- grep("[.]sfc", list.files(karr$project_Dir, full=TRUE), value=TRUE)
+    fileName <- grep("[.]sfc", list.files(rmetObj$project_Dir, full=TRUE), value=TRUE)
     stopifnot(length(fileName) == 1)
     surface_file_1 <- readIt(fileName)
   }
