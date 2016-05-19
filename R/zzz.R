@@ -25,9 +25,14 @@
                      c(7,13,43,48,51,57,65,74,82,91,99),
                      USE.NAMES = FALSE)
   surfhist <- t(surfhist)
-  surfhist <- as.data.frame(surfhist)
+  surfhist <- as.data.frame(surfhist,stringsAsFactors = FALSE)
   names(surfhist) <- c("USAF","WBAN","STATION_NAME","CTRY","ST",
                        "CALL","LAT","LON","ELEV","BEGIN","END")
+  
+  # Change variable types
+  surfhist$LAT <- as.numeric(surfhist$LAT)
+  surfhist$LON <- as.numeric(surfhist$LON)
+  
   assign("surfhist", surfhist, envir = rmetData)
   invisible()
 }
