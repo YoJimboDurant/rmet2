@@ -2,7 +2,7 @@ library(rmet2)
 
 #windows intaller for binaries:
 installAM(aermetExists=rep(TRUE,3))
-
+#installAM()
 #real programmers use Linux (or at least try to)
 # options(aerminute  =  "aerminute_15272.exe")
 # options(aermet = "aermet")
@@ -12,7 +12,7 @@ installAM(aermetExists=rep(TRUE,3))
 #create object
 karr <- createMetProject(
   project_Name = "CHICAGO AURORA MUNI AP",
-   project_Dir="~/test/karr",
+   project_Dir="C:/test/karr",
 #  project_Dir="/RMET_WORKING/TEST/KARR",
   start_Date = lubridate::mdy_hm("01/01/2011 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("12/31/2015 23:00", tz="Etc/GMT+6"),
@@ -29,7 +29,7 @@ karr <- createMetProject(
   ua_Latitude = 40.15,
   ua_Longitude = -89.15,
   ifg = "Y 12 06 2002",
-  lc_File = "~/lufiles/illinois.nlcd.tif",
+  lc_File = "C:\\test\\illinois.nlcd.tif",
   lc_Type = "NLCD1992",
   imp_File = NULL,
   imp_Type = NULL,

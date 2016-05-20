@@ -20,8 +20,6 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
   
   if (R.version$os !="linux-gnu"){
     setInternet2(use = NA) 
-    setInternet2(use = FALSE) 
-    setInternet2(use = NA) 
   }
   
   

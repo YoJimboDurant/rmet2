@@ -18,11 +18,7 @@ downloadFSL <- function(rmetObj){
 # stopif
 #stopifnot(!is.null(WMO) & !is.null(WBAN))
 
-if (R.version$os !="linux-gnu"){
-  setInternet2(use = NA)
-  setInternet2(use = FALSE)
-  setInternet2(use = NA)
-}
+
 
   # check is directories exist and if not, create them
   
