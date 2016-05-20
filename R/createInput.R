@@ -12,6 +12,13 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
  # type <- match.arg(type)
   stopifnot(class(rmetObj) =="rmet")
   stopifnot(all(type %in% c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3")))
+  missAerminute <- all(c(sapply(kgeg$td6401_noaa, function(x) length(x)==0),
+                       sapply(kgeg$td6405_noaa, function(x) length(x)==0)))
+  if(missAerminute){
+    warning("No TD6401 Files and TD6405 Files - no aerminute inputs created!")
+    type <- type[type !="aerminute"]
+  }
+  
   loc_years <- locYears(rmetObj)
   
   xtz <- lubridate::tz(rmetObj$start_Date)
@@ -251,10 +258,10 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
           "SURFACE",
           "**",
            paste0("  QAOUT        ", prepareThePath(ishqaoutFiles[[i]])),
-          if(length(rmetObj$td6405_noaa) > 0 | length(rmetObj$td6401_noaa) > 0){
+          if(!missAerminute){
            paste0("  ASOS1MIN        ", prepareThePath(paste0(destDir[[i]], "/AM_", "1MIN_", 
                                                               loc_years[[i]], ".DAT")))
-          }
+          }else{"** MISSING AERMINUTE FILES"}
           
         ),
         MERGE = list(

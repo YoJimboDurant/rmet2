@@ -31,7 +31,7 @@ if("aersurface" %in% type){
     if(dewinter){
       inpFile <- paste(rmetObj$project_Dir, "aersurface/aersurface_dewinter.inp", sep="/")
       newObj <- rmetObj
-      newObj$aersurface$surfaceSeason$as_Winter_NS <- paste(karr$aersurface$surfaceSeason$as_Winter_WS, karr$aersurface$surfaceSeason$as_Winter_NS)
+      newObj$aersurface$surfaceSeason$as_Winter_NS <- paste(rmetObj$aersurface$surfaceSeason$as_Winter_WS, rmetObj$aersurface$surfaceSeason$as_Winter_NS)
       newObj$aersurface$surfaceSeason$as_Winter_WS <- NULL
       newObj$aersurface$surfaceChar$as_Snow <- "N"
       newObj <- createInput(newObj, "aersurface")
