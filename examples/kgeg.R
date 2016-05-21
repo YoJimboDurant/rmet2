@@ -1,19 +1,19 @@
 library(rmet2)
 
 #windows intaller for binaries:
-installAM(aermetExists=rep(TRUE,3))
+#installAM(aermetExists=rep(TRUE,3))
 
 #real programmers use Linux (or at least try to)
-# options(aerminute  =  "aerminute_15272.exe")
-# options(aermet = "aermet")
-# options(aersurface = "aersurface")
+ options(aerminute  =  "aerminute_15272.exe")
+ options(aermet = "aermet")
+ options(aersurface = "aersurface")
 
 
 #create object
 kgeg <- createMetProject(
   project_Name = "SPOKANE INTL AP",
-   project_Dir="~/test/kgeg",
-#  project_Dir="/RMET_WORKING/TEST/kgeg",
+#   project_Dir="~/test/kgeg",
+  project_Dir="/RMET_WORKING/TEST/KGEG",
   start_Date = lubridate::mdy_hm("01/01/2008 00:00", tz="Etc/GMT+6"),
   end_Date = lubridate::mdy_hm("12/31/2013 23:00", tz="Etc/GMT+6"),
   surf_UTC = -8,
@@ -29,7 +29,7 @@ kgeg <- createMetProject(
   ua_Latitude =  47.6806,
   ua_Longitude = -117.6267,
   ifg = "Y 06 14 2007",
-  lc_File = "~/lufiles/washington.nlcd.tif",
+  lc_File = "/RMET_WORKING/washington.nlcd.tif",
   lc_Type = "NLCD1992",
   imp_File = NULL,
   imp_Type = NULL,
@@ -44,7 +44,7 @@ kgeg <- createMetProject(
   as_Spring ="4 5",
   as_Summer = "6 7 8",
   as_Autumn = "9 10")
- 
+
 
 downloadTD3505(kgeg) # could combine into one step
 downloadTD6405(kgeg)
