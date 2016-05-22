@@ -12,8 +12,12 @@
 
 #' @export
 mapstation <- function(site,farthest=25000) {
+  
+  if("surfhist" %in% ls (envir = rmetData)){
+    stations <- get("surfhist", envir = rmetData)
+  }
   #stations <- readLines("http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt")
-  stations <- read.csv("input.csv")
+  # stations <- read.csv("input.csv")
 
   # Remove stations without longitude/latitude
   stations <- stations[!is.na(stations$LAT),]
@@ -40,6 +44,8 @@ mapstation <- function(site,farthest=25000) {
   pts <- cbind(stations$LON,stations$LAT)
   bbb <- sp::SpatialPointsDataFrame(pts,stations)
 
-  map <- leaflet::leaflet(bbb) %>% addTiles() %>% addMarkers(popup=~STATION_NAME) %>% addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+  map <- leaflet::leaflet(bbb) %>% addTiles() %>% 
+    addMarkers(popup=~htmltools::htmlEscape(paste0(STATION_NAME,"\n USAF:",USAF,"\n WBAN:",WBAN))) %>% 
+    addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
   map
 }

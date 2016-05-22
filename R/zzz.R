@@ -16,7 +16,10 @@
   toset <- !(names(op.rmet) %in% names(op))
   if(any(toset)) options(op.rmet[toset])
   assign("rmetData", new.env(hash = TRUE), envir = .GlobalEnv) 
-  assign("surf_Hist", readLines(getOption("rmet.noaa.surfhist")), envir = rmetData)
+  
+  
+  rmet2:::readisd()
+  
   invisible()
 }
 
@@ -25,9 +28,10 @@
                         current rmet options are set to:\n")
   
   print(sapply(grep("rmet", names(options()), value=TRUE), getOption))
-  if("surf_Hist" %in% ls (envir = rmetData)){
-    print(paste("Surface File History File Loaded from", getOption("rmet.noaa.surfhist")))
-  }else{
-    print("Error loading surface file history see ?rmet.options")
-    } 
+  rmet2:::readisd()
+  # if("surf_Hist" %in% ls (envir = rmetData)){
+  #   print(paste("Surface File History File Loaded from", getOption("rmet.noaa.surfhist")))
+  # }else{
+  #   print("Error loading surface file history see ?rmet.options")
+  #   } 
 }

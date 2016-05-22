@@ -106,21 +106,16 @@ createMetProject <- function(project_Name,
     
     
     #check surface station exists and is within correct dates.
-      stopifnot(any(grepl(paste0("^", surf_USAF, " +", surf_WBAN), get("surf_Hist", envir=rmetData))))
+ 
+    surf_Hist <- get("surfhist", envir=rmetData)
+      stopifnot(any(grepl(surf_USAF, surf_Hist$USAF) &
+                      grepl(surf_WBAN, surf_Hist$WBAN)))
       
-      TD3505Line <- grep(paste0("^", surf_USAF, " +", surf_WBAN), get("surf_Hist", envir=rmetData), value=TRUE)
+      TD3505df <- surf_Hist[as.numeric(surf_Hist$USAF) == (surf_USAF) & 
+                                as.numeric(surf_Hist$WBAN) == surf_WBAN,]
       #check dates
-      if(length(TD3505Line) > 1) stop(paste(" Identified more than 1 surface station:\n", paste(TD3505Line, collapse = "\n")))
-      TD3505df <- read.fwf(textConnection(TD3505Line), widths = c(6,-1,5, -1,
-                                                                  29, -1, 2, -3,
-                                                                  2, -1, 4, -2, 7,
-                                                                  -1, 7, -1, 8, -1, 8, 
-                                                                  -1, 8))
-      names(TD3505df) <- c("USAF", "WBAN", "STATION NAME", "CTRY", "ST",  
-                           "CALL",  "LAT", "LON",  "ELEV(M)",  "BEGIN", "END")
-      TD3505df$BEGIN <- lubridate::ymd(TD3505df$BEGIN)
-      TD3505df$END <- lubridate::ymd(TD3505df$END)
-      
+      if(dim(TD3505df)[[1]] > 1) stop(paste(" Identified more than 1 surface station:\n", paste(TD3505Df, collapse = "\n")))
+
       if(as.numeric(start_DateUTC) > as.numeric(end_DateUTC)) 
         stop("Surface dates data error: \n start_Date before end_Date!")
       
