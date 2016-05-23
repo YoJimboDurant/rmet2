@@ -12,8 +12,8 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
  # type <- match.arg(type)
   stopifnot(class(rmetObj) =="rmet")
   stopifnot(all(type %in% c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3")))
-  missAerminute <- all(c(sapply(kgeg$td6401_noaa, function(x) length(x)==0),
-                       sapply(kgeg$td6405_noaa, function(x) length(x)==0)))
+  missAerminute <- all(c(sapply(rmetObj$td6401_noaa, function(x) length(x)==0),
+                       sapply(rmetObj$td6405_noaa, function(x) length(x)==0)))
   if(missAerminute){
     warning("No TD6401 Files and TD6405 Files - no aerminute inputs created!")
     type <- type[type !="aerminute"]
