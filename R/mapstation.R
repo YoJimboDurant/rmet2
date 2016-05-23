@@ -8,44 +8,64 @@
 #' 
 #' @param site a character string that can be geocoded by the Google Maps API.
 #' For example, "30341", "4770 Buford Hwy. Atlanta GA 30341", and "CDC".
-#' @param farthest a numeric value in meters that determine the farthest station to be mapped from the \code{site} If no value is specified a defalt value of 25,000 meters is used.
+#' @param farthest a numeric value in meters that determine the farthest station
+#' to be mapped from the \code{site} If no value is specified a defalt value
+#' of 25 kilometers is used.
+#' @param engine a character string to specify the mapping application to be used:
+#' \code{"leaflet"} or \code{"kml"}.
 
 #' @export
-mapstation <- function(site,farthest=25000) {
-  
+mapstation <- function(site,farthest=25,engine="leaflet") {
   if("surfhist" %in% ls (envir = rmetData)){
     stations <- get("surfhist", envir = rmetData)
   }
-  #stations <- readLines("http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt")
-  # stations <- read.csv("input.csv")
-
+  
   # Remove stations without longitude/latitude
-  stations <- stations[!is.na(stations$LAT),]
-  stations <- na.omit(stations)
+  stations <- stations[!is.na(stations$LAT) & !is.na(stations$LON),]
   
   # Remove stations with erroneous longitude/latitude
   stations <- stations[stations$LON>-360,]
   
-  #summary(as.matrix(stations[,c("LON","LAT")]))
-  
   # Get coord of point of interest
   coord <- ggmap::geocode(site)
   
-  
-  #as.matrix(stations[,c("LON","LAT")])
-  
   #Calculate distance between site and stations
-  aaa <- geosphere::distm(as.matrix(coord),as.matrix(stations[,c("LON","LAT")]))
-  stations$dist <- as.vector(aaa)
-
-  # Filter stations to only those where the distance is less than "farthest"
-  stations <- stations[stations$dist<farthest,]
+  stations$dist <- as.vector(geosphere::distm(as.matrix(coord),
+                                              as.matrix(stations[, c("LON", "LAT")])))
   
+  # Filter stations to only those where the distance is less than "farthest"
+  stations <- stations[stations$dist<farthest*1000,]
+  
+  # Create spatial dataframe for mapping
   pts <- cbind(stations$LON,stations$LAT)
-  bbb <- sp::SpatialPointsDataFrame(pts,stations)
-
-  map <- leaflet::leaflet(bbb) %>% addTiles() %>% 
-    addMarkers(popup=~htmltools::htmlEscape(paste0(STATION_NAME,"\n USAF:",USAF,"\n WBAN:",WBAN))) %>% 
-    addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+  sdf <- sp::SpatialPointsDataFrame(pts,stations)
+  
+  # Create labels for mapping
+  dist <- paste(format(sdf$dist/1000,digits = 3),"km from your site")
+  sdf$label <- paste(sdf$STATION_NAME,
+                     dist,
+                     paste("USAF =",sdf$USAF,"|","WBAN =",sdf$WBAN),
+                     sep="<br>")
+  
+  # Plot stations in Leaflet
+  if(engine=="leaflet"){
+    map <- leaflet::leaflet(sdf) %>%
+      addTiles() %>%
+      addMarkers(popup=~label) %>%
+      addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+  }
+  
+  # PLot stations in KML (Google Earth)
+  if(engine=="kml") {
+    sdf$size <- 5
+    sdf$colour <- "red"
+    proj4string(sdf) = CRS("+init=epsg:4326")
+    map <- plotKML::plotKML(sdf,
+                            balloon=TRUE,
+                            size=as.name("size"),
+                            colour=as.name("colour"))
+  }
+  
   map
+  
 }
