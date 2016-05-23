@@ -10,16 +10,16 @@
 #' For example, "30341", "4770 Buford Hwy. Atlanta GA 30341", and "CDC".
 #' @param farthest a numeric value in meters that determine the farthest station
 #' to be mapped from the \code{site} If no value is specified a defalt value
-#' of 25,000 meters is used.
+#' of 25 kilometers is used.
 #' @param engine a character string to specify the mapping application to be used:
 #' \code{"leaflet"} or \code{"kml"}.
 
 #' @export
 mapstation <- function(site,farthest=25,engine="leaflet") {
-  
   if("surfhist" %in% ls (envir = rmetData)){
     stations <- get("surfhist", envir = rmetData)
   }
+  
   # Remove stations without longitude/latitude
   stations <- stations[!is.na(stations$LAT) & !is.na(stations$LON),]
   
