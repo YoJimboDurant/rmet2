@@ -42,6 +42,15 @@ print.rmet <- function(rmetObj){
 
 
 ##' @export
+##' @method print rmetSum
+print.rmetSum <- function(rmetSum){
+  stopifnot(class(rmetSum) == "rmetSum")
+  sapply(rmetSum, function(x){
+  pander::pander(x)
+  })
+}
+
+##' @export
 prepareThePath <- function(x) {
   x <- path.expand(x)
   x <- paste0("\"", x, "\"")
