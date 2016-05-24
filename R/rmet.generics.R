@@ -14,6 +14,10 @@ locYears <- function(rmetObj) {
   names(rmetObj$td6405_noaa)
 }
 
+
+
+
+
 ##' @export
 is.rmet <- function(rmetObj, full.test=FALSE){
   output <- is(rmetObj) == "rmet"
