@@ -6,18 +6,19 @@
 #' @export
 
 
-mesoData<- function(rmetObj, API_KEY, type=c("surf","ua")){
+mesoData<- function(call = NULL, rmetObj = NULL, API_KEY, type=c("surf","ua")){
   stopifnot(type %in% c("surf", "ua"))
-  stopifnot(is(rmetObj) == "rmet")
-  if(rmetObj$surf_Call==""| is.na(rmetObj$surf_Call) | is.null(rmetObj$surf_Call)) stop("empty or missing surf_Call")
+  stopifnot(is(rmetObj) == "rmet" | is.null(rmetObj))
+ if(!is.null(rmetObj)) stopifnot(is(rmetObj == "rmet"))
   
 #   library(RCurl)
 #   library(jsonlite)
 
   if("surf" %in% type)
-    station <- rmetObj$surf_Call
-    x <- getURL(paste0("http://api.mesowest.net/v2/stations/metadata?&token=",myAPI, "&complete=1&sensorvars=1", "&stids=", station))
-    x <- fromJSON(x)       
+    if(!is.null(rmetObj)) station <- rmetObj$surf_Call
+    if(!is.null(call)) station <- call
+    x <- RCurl::getURL(paste0("http://api.mesowest.net/v2/stations/metadata?&token=",API_KEY, "&complete=1&sensorvars=1", "&stids=", station))
+    x <- jsonlite::fromJSON(x)       
     if(x$SUMMARY$RESPONSE_MESSAGE !="OK") stop("Error retrieving data from Meso West")
     rmetObj$surf_Latitude  <- as.numeric(x$STATION$LATITUDE[[1]])
     rmetObj$surf_Longitude <- as.numeric(x$STATION$LONGITUDE[[1]])
