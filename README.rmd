@@ -1,0 +1,37 @@
+---
+title: "rmet2 Working Example"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+This package is designed to assist members of the general public with running US EPA's Meteorological Processors, [AERMINUTE][https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm], [AERSURFACE][https://www3.epa.gov/ttn/scram/dispersion_related.htm#aersurface], and [AERMET][https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm]. Rmet2 provides the following features:
+
+* Automatic Downloading of Meteorological Data from National Oceonographic and Atmospheric Administration (NOAA) websites.
+
+* Scripted set up of runstream input files to assist in reproducibility.
+
+* Caputuring output runstreams and files and producing tables and figures useful for air dispersion modelers to perform quality assurance checks on intermediate and final outputs of the meteorological preprocessors.
+
+
+## Example of usage - Corpus Christi, TX
+
+To use rmet2, you will need 
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
