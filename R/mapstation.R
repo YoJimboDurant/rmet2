@@ -15,7 +15,7 @@
 #' \code{"leaflet"} or \code{"kml"}.
 
 #' @export
-mapstation <- function(site,farthest=25,engine="leaflet") {
+mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
   if("surfhist" %in% ls (envir = rmetData)){
     stations <- get("surfhist", envir = rmetData)
   }
@@ -42,18 +42,33 @@ mapstation <- function(site,farthest=25,engine="leaflet") {
   
   # Create labels for mapping
   dist <- paste(format(sdf$dist/1000,digits = 3),"km from your site")
-  sdf$label <- paste(sdf$STATION_NAME,
+  if(labels == "popup") {sdf$label <- paste(sdf$STATION_NAME,
                      dist,
                      paste("USAF =",sdf$USAF,"|","WBAN =",sdf$WBAN),
                      sep="<br>")
+  }else{sdf$label <- paste(sdf$STATION_NAME,
+                           dist,
+                           paste("USAF =",sdf$USAF,"|","WBAN =",sdf$WBAN),
+                           sep="\n")
+  }
   
   # Plot stations in Leaflet
-  if(engine=="leaflet"){
+  if(engine=="leaflet" & labels == "text"){
     map <- leaflet::leaflet(sdf) %>%
       addTiles() %>%
-      addMarkers(popup=~label) %>%
+      addMarkers(label=~label,
+                          labelOptions = labelOptions(
+                            noHide = 'T')) %>%
       addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
   }
+  
+  if(engine=="leaflet" & labels == "popup"){
+    map <- leaflet::leaflet(sdf) %>%
+      addTiles() %>%
+      addMarkers(label=~label, labelOptions = labelOptions(clickable = TRUE)) %>%
+      addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+  }
+  
   
   # PLot stations in KML (Google Earth)
   if(engine=="kml") {

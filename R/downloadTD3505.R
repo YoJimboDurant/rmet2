@@ -14,7 +14,21 @@ downloadTD3505 <- function (rmetObj, ...) {
   print("Checking if files have been downloaded")
   print(rmetObj$td3505_noaa)
   
+  
+  
   loc_years <- locYears(rmetObj)
+  lapply(seq_along(loc_years), function(i){
+    locFiles <- paste0(rmetObj$project_Dir, loc_years[[i]], gsub
+           ("http://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}",
+           "S", rmetObj$td3505_noaa[[i]]), sep="/")
+    print(locFiles)
+    locExist <- file.exists(locFiles)
+    locExist
+    
+  })
+  
+  
+  
   
   #UTC timezone
   if(rmetObj$surf_UTC < 0){
