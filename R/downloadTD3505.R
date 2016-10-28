@@ -9,24 +9,31 @@
 #' @export
 
 
-downloadTD3505 <- function (rmetObj, ...) {
+downloadTD3505 <- function (rmetObj, check=TRUE...) {
   
+  if(check){
   print("Checking if files have been downloaded")
   print(rmetObj$td3505_noaa)
   
   
   
   loc_years <- locYears(rmetObj)
-  lapply(seq_along(loc_years), function(i){
-    locFiles <- paste0(rmetObj$project_Dir, loc_years[[i]], gsub
-           ("http://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}",
-           "S", rmetObj$td3505_noaa[[i]]), sep="/")
-    print(locFiles)
-    locExist <- file.exists(locFiles)
-    locExist
+  locExist <- lapply(seq_along(loc_years), function(i){
+    locFiles <- gsub ("http://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}/",
+           "S", rmetObj$td3505_noaa[[i]])
+    locFiles <- substring(locFiles, 1, 14)
+    locFiles <- gsub("-", "", locFiles)
+    locFiles <- paste0(locFiles, "_", loc_years[[i]], ".ISH")
+    locFiles <- unique(locFiles)
+    locFiles <- paste0(rmetObj$project_Dir, "/",
+                       loc_years[[i]], "/", locFiles)
     
+    locExist <- file.exists(locFiles)
+    print(locExist)
+    locExist <- !locExist
   })
-  
+
+  }
   
   
   
@@ -34,6 +41,7 @@ downloadTD3505 <- function (rmetObj, ...) {
   if(rmetObj$surf_UTC < 0){
     lapply(seq_along(loc_years), function(i) {
       if(length(rmetObj$td3505[[i]])>1){
+        if(locExist[[i]]){
         sourceFile <- rmetObj$td3505[[i]][[1]]
         fileOut<-readLines(con=gzcon(url(sourceFile)))
         
@@ -63,7 +71,9 @@ downloadTD3505 <- function (rmetObj, ...) {
         if(!dir.exists(yearDir)) dir.create(yearDir)
         destFile <- paste0(yearDir,"/","S",station_ID,"_",loc_years[[i]], ".ISH")
         write(fileOut, file=destFile)
+        }
       }else{
+        if(locExist[[i]]){
         sourceFile <- rmetObj$td3505[[i]][[1]]
         fileOut<-readLines(con=gzcon(url(sourceFile)))
         station_ID <- substr(fileOut[[1]], 5,15)  
@@ -78,11 +88,15 @@ downloadTD3505 <- function (rmetObj, ...) {
         if(!dir.exists(yearDir)) dir.create(yearDir)
         destFile <- paste0(yearDir,"/","S",station_ID,"_",loc_years[[i]], ".ISH")
         write(fileOut, file=destFile)
+        }
+        
   }
       }
   )
     }
-    
+  
+  
   return(NULL)
+  
 }
 
