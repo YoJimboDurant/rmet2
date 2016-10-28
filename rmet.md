@@ -133,7 +133,7 @@ kcrp <- createMetProject(
   ua_Latitude = 27.77,
   ua_Longitude = -97.50,
   ifg = "Y 02 13 2006",
-  lc_File = "C:\\test\\cc\\texas_se.nlcd.tif",
+  lc_File = "C:\\temp\\cc\\landuse\\texas_se.nlcd.tif",
   lc_Type = "NLCD1992",
   imp_File = NULL,
   imp_Type = NULL,
@@ -144,7 +144,7 @@ kcrp <- createMetProject(
   as_Moisture = "A",
   as_Airport = "Y",
   as_Winter_NS ="12 1 2",
-  as_Winter_WS = "",
+  as_Winter_WS = NULL,
   as_Spring ="3 4 5",
   as_Summer = "6 7 8",
   as_Autumn = "9 10 11")
@@ -354,4 +354,14 @@ downloadFSL(kcrp)
 
 #### Create Input Files
 
-Two functions are used to c kcrp &lt;- createInput(karr) \# probably should combine this into one step kcrp &lt;- writeInputFile(karr, c("aerminute", "aersurface"))
+Two functions are used to create input strings for the AERMET and AERSURFACE and then write them to the appropriate directories
+
+``` r
+kcrp <- createInput(kcrp) # probably should combine this into one step
+```
+
+    ## [1] "Writing AERMINUTE inpute files:\n"
+
+``` r
+kcrp <- writeInputFile(kcrp, c("aerminute", "aersurface"))
+```
