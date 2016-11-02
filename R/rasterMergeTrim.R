@@ -68,7 +68,7 @@ rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 1000,
     rastXY <- do.call(raster::merge, rasterList)
     raster::colortable(rastXY) <- raster::colortable(rasterList[[1]])
     raster::writeRaster(rastXY, filename=outFile, 
-                          options=c("TFW=YES", NBITS=8), overwrite=TRUE)
+                          options=c("TFW=YES", NBITS=8, "COMPRESS=NONE"), overwrite=TRUE)
     
   }
   
