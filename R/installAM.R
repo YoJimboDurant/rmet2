@@ -28,8 +28,9 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
   scramLines <- readLines("https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm", warn=FALSE)
   
   #aerminutedownload
-  aerminuteLink <- grep("https://www.epa.gov/ttn/scram/7thconf/aermod/aerminute_.*?[.]zip", scramLines, value=TRUE)
-  aerminuteLink <- str_extract(aerminuteLink, "https://www.epa.gov/ttn/scram/7thconf/aermod/aerminute_.*?[.]zip")
+  aerminuteLink <- grep("aerminute_.*?[.]zip", scramLines, value=TRUE)
+  aerminuteLink <- str_extract(aerminuteLink, "/ttn/scram/7thconf/aermod/aerminute_.*?[.]zip")
+  aerminuteLink <- paste0("https://www3.epa.gov", aerminuteLink)
   
   aerminuteVersion <- str_extract(aerminuteLink, "[0-9]{5}")
   aerminOut <- paste0(rootDir,"aerminute_",aerminuteVersion)
