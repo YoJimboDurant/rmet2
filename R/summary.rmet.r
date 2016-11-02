@@ -17,6 +17,16 @@ summary.rmet <- function(rmetObj){
                               "_",loc_years, ".ISH")
   rmetSummary$td3505_downladed <- data.frame(td305_file = td3505_downloaded, downloaded = file.exists(td3505_downloaded))
   
+  td6505_summay <- sapply(seq_along(loc_years), function(i){
+    year <- loc_years[[i]]
+    n_months <- length(rmetOb$td6405_noaa[[i]])
+    destfiles <- gsub("^.*/", "",  rmetObj$td6405[[i]])
+    destfiles <- paste(rmetObj$project_Dir, loc_years[[i]], destfiles)
+        
+      
+    n_missing <- sum(file.exists(destfiles))
+    data.frame(year, n_months, n_missing)
+  })
   
   fsl_downloaded <- paste0(yearDir, "/", rmetObj$ua_WMO, ".FSL")
   

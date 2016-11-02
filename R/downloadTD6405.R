@@ -11,7 +11,7 @@
 
 
 downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
-  
+  loc_years <- names(rmetObj$td6405_noaa)
   if(check){
     
     print("Checking if files have been downloaded")
@@ -29,7 +29,7 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
       locExist <- !locExist
     })
     
-    loc_years <- names(rmetObj$td6405_noaa)
+    
     
     lapply(seq_along(loc_years), function(i) {
       destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")

@@ -9,7 +9,7 @@
 #' @export
 
 
-downloadTD3505 <- function (rmetObj, check=TRUE...) {
+downloadTD3505 <- function (rmetObj, check=TRUE,...) {
   
   if(check){
   print("Checking if files have been downloaded")

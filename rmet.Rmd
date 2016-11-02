@@ -94,7 +94,7 @@ kcrp <- createMetProject(
   ua_Latitude = 27.77,
   ua_Longitude = -97.50,
   ifg = "Y 02 13 2006",
-  lc_File = "C:\\temp\\cc\\landuse\\texas_se.nlcd.tif",
+  lc_File = "C:\\temp\\cc\\landuse\\kcrp_nlcd92.tif",
   lc_Type = "NLCD1992",
   imp_File = NULL,
   imp_Type = NULL,
