@@ -43,7 +43,7 @@ rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 1000,
     dfx <- spTransform(y.sp, CRS(proj4string(rasterFiles)))
     
     rastXY <- raster::crop(rasterFiles, raster::extent(dfx))
-    writeRaster(rastXY, filename=outFile, 
+    raster::writeRaster(rastXY, filename=outFile, 
                 options=c("TFW=YES", NBITS=8), overwrite=TRUE)
    
   }else{
