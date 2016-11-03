@@ -132,5 +132,5 @@ kcrp <- writeInputFile(kcrp, c("aerminute", "aersurface"))
 
 ### Process Data
 ```{r aerminute_surface}
-processMet(kcrp, processor=c("aerminute","aersurface"))
+kcrp <- processMet(kcrp, processor=c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3"))
 ```

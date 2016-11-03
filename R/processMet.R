@@ -6,9 +6,11 @@
 #' 
 #' @export
 
-processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet")){
+processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet1",
+                                              "aermet2", "aermet3")){
   
-  stopifnot(processor %in% c("aerminute", "aersurface", "aermet"))
+  stopifnot(processor %in% c("aerminute", "aersurface", "aermet1", 
+                             "aermet2", "aermet3"))
   
   if("aerminute" %in% processor) {
     sapply(seq_along(rmetObj$inputFiles$aerminute), function(i) {
@@ -25,7 +27,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     tmp <- sapply(moveFiles, function(x) file.rename(x, paste(rmetObj$project_Dir,
                                                               locYears(rmetObj)[[i]], x, 
                                                               sep="/")))
-    return(NULL)
+    
   }
   )
   }
@@ -35,8 +37,36 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     system(getOption("aersurface"), 
            input=readLines(rmetObj$inputFiles$aersurface[grepl("aersurface.inp", 
                                                             rmetObj$inputFiles$aersurface)]))
+    rmetObj$output$aersurface <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", sep="/"))
+  }
+  
+  if("aermet1" %in% processor){
+  
+  lapply(rmetObj$inputText$aermet$s1, function(x) {
+    write(x, file="AERMET.INP")
+    system(getOption("aermet"))
+  })
   }
   
   
+  if("aermet2" %in% processor){
+    
+  lapply(rmetObj$inputText$aermet$s2, function(x) {
+    write(x, file="AERMET.INP")
+    system(getOption("aermet"))
+  })
   
+  }
+  
+  if("aermet3" %in% processor){
+    
+  lapply(seq_along(rmetObj$inputText$aermet$s3), function(i) {
+    write(c(rmetObj$inputText$aermet$s3[[i]], rmetObj$output$aersurface), file="AERMET.INP")
+    system(getOption("aermet"))
+  })
+  
+  }
+  
+  
+  return(rmetObj)
 }
