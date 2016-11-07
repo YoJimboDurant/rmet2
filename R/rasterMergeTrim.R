@@ -4,17 +4,25 @@
 #' \code{rasterMergeTrim} Crops a NLCD or NED file to a radius around a fixed point.
 #' The point is expected to be WGS 1984 lattitude and longitude. Buffer is in meters.
 #' 
+#' NLCD 1992 data is becoming challenging to obtain, at least for me. Previously,
+#' I have been downloading NLCD 1992 data from Earth Explorer. These files have 
+#' colortable attributes and will it will be preserved in the trimming and merging
+#' process. However, it seems these files have wandered off of the Earth Explorer website,
+#' so not, I am currently downloading these rasters from [Mult-Resolution Land Characteristics Consortium](http://www.mrlc.gov/nlcd92_data.php)
+#' However, these tiles lack a legend and colortable attributes. This function will add the
+#' a colortable for processing with AERSURFACE. 
+#' 
 #'  @param rasterFiles a single character string or vector of character strings specifying 
 #'  the location of the rasters to be cropped merged. 
 #'  
 #'  @param long numeric longitude of point
 #'  @param lat numeric latitude of point
-#'  @buffer distance in meters for cropping around point
+#'  @buffer distance in meters for cropping around point (meters)
 #'  @outFile destination of merged and cropped output
 #' @export
 #' 
 
-rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 1000,
+rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 5000,
                             outFile){
   stopifnot(is.numeric(long))
   stopifnot(long>-180 & long < 180)
@@ -43,6 +51,13 @@ rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 1000,
     dfx <- spTransform(y.sp, CRS(proj4string(rasterFiles)))
     
     rastXY <- raster::crop(rasterFiles, raster::extent(dfx))
+    if(length(raster::colortable(rastXY)) == 0){
+      rastXY@legend <- nlcdLegend
+    
+      }else{
+        raster::colortable(rastXY) <- raster::colortable(rasterList[[1]])
+    }
+    
     raster::writeRaster(rastXY, filename=outFile, 
                 options=c("COMPRESS=NONE", "TFW=YES"), overwrite=TRUE)
    
@@ -66,7 +81,12 @@ rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 1000,
 
     rasterList$overwrite = TRUE
     rastXY <- do.call(raster::merge, rasterList)
-    raster::colortable(rastXY) <- raster::colortable(rasterList[[1]])
+    if(length(raster::colortable(rastXY)) == 0){
+      rastXY@legend <- raster::nlcdLegend
+    }else{
+      raster::colortable(rastXY) <- colortable(rasterList[[1]])
+    }
+    
     raster::writeRaster(rastXY, filename=outFile, 
                           options=c("TFW=YES", "COMPRESS=NONE"), overwrite=TRUE)
     
