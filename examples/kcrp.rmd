@@ -1,0 +1,123 @@
+---
+title: "Corpus Christi Example (KCRP)"
+output: github_document
+always_allow_html: yes
+
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+## Example of usage - Interactive Single Site
+For a single site, most users will develop and run a script to process the data. First, we need to identify NOAA surface stations near the site of interest.
+
+TO use rmet2, you will type the following into the console:
+
+```{r libraryrmet2, message=FALSE, warning=FALSE}
+library(rmet2)
+```
+
+The `mapstation` function can be used to identify prospective stations near a site:
+```{r map}
+mapstation("Corpus Christi, TX", labels="text")
+```
+
+Data for the project:
+
+* We select Corpus Christi International Airport as our surface station (USAF ID=722510, WBAN = 12924).
+
+* We will use upper air data from Corpus Christi (WBAN = 12924, WMO = 72251)
+
+* We will run AERMET for the January 1, 2009 - December, 31, 2013 (5 years)
+
+* We will process using AERMINUTE
+
+* For purposes of demostration, we will run the project in directory "C:/temp/CC"
+
+### Install Aermet, Aerminute, and Aersurface
+`installAM` attempts to download the current versions of Aermet, Aersurface and Aerminute from the [SCRAM Meteorological Processors website](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm) and [SCRAM  Related Programs Website](https://www3.epa.gov/scram001/dispersion_related.htm). After downloading, the program sets the location of aermet, aerminute, and aersurface executables in the `options()`. Links at these websites change, so `installAM` can be set just to configure `options` - see `?installAM`.
+
+```{r installAM}
+installAM()
+
+```
+This is the location of the executables.
+
+```{r check}
+sapply(c("aermet", "aerminute", "aersurface"), getOption)
+```
+
+
+### Create rmet object
+
+```{r include=FALSE}
+if(file.exists("C:/Temp/cc/CORPUS.CHRISTI.AP.rds")) file.remove("C:/Temp/cc/CORPUS.CHRISTI.AP.rds")
+```
+```{r createObj, message = FALSE}
+kcrp <- createMetProject(
+  project_Name = "CORPUS CHRISTI AP",
+   project_Dir="C:/temp/cc",
+  start_Date = lubridate::mdy_hm("01/01/2009 00:00", tz="Etc/GMT+6"),
+  end_Date = lubridate::mdy_hm("12/31/2013 23:00", tz="Etc/GMT+6"),
+  surf_UTC = -6,
+  surf_WBAN = 12924,
+  surf_USAF = 722510,
+  surf_Call="KCRP",
+  surf_Latitude = 27.7742,
+  surf_Longitude = -97.5122,
+  surf_Elevation = 13,
+  surf_AnenometerHeight = 10,
+  ua_WMO=72251,
+  ua_UTC=-6,
+  ua_Latitude = 27.77,
+  ua_Longitude = -97.50,
+  ifg = "Y 02 13 2006",
+  lc_File = "C:\\temp\\cc\\landuse\\kcrp_nlcd92.tif",
+  lc_Type = "NLCD1992",
+  imp_File = NULL,
+  imp_Type = NULL,
+  cnpy_File = NULL,
+  cnpy_Type = NULL,
+  as_Snow = "N",
+  as_Arid = "Y",
+  as_Moisture = "A",
+  as_Airport = "Y",
+  as_Winter_NS ="12 1 2",
+  as_Winter_WS = NULL,
+  as_Spring ="3 4 5",
+  as_Summer = "6 7 8",
+  as_Autumn = "9 10 11")
+```
+
+The project is also save as an RDS file. If the RDS file is detected in the directory, `createMetProject` will automatically load that and issue a warning. 
+
+#### Download Data
+Now we can progress to downloading data
+```{r download, cache=TRUE}
+downloadTD3505(kcrp) # could combine into one step
+downloadTD6405(kcrp)
+downloadTD6401(kcrp)
+downloadFSL(kcrp)
+```
+
+#### Create Input Files
+Two functions are used to create input strings for the AERMET and AERSURFACE and then write them to the appropriate directories
+```{r inputam}
+kcrp <- createInput(kcrp) # probably should combine this into one step
+kcrp <- writeInputFile(kcrp, c("aerminute", "aersurface"))
+```
+
+
+### Process Data
+```{r aerminute_surface}
+kcrp <- processMet(kcrp, processor=c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3"))
+```
+
+### Finalize Main SFC and PFL files
+```{r finalize}
+makeFinal(kcrp, "kcrp")
