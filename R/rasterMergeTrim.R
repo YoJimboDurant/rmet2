@@ -52,7 +52,8 @@ rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 5000,
     
     rastXY <- raster::crop(rasterFiles, raster::extent(dfx))
     if(length(raster::colortable(rastXY)) == 0){
-      rastXY@legend <- nlcdLegend
+      
+      rastXY@legend@colortable <- nlcdLegend
     
       }else{
         raster::colortable(rastXY) <- raster::colortable(rasterList[[1]])
@@ -82,8 +83,8 @@ rasterMergeTrim <- function(rasterFiles, long, lat, buffer = 5000,
     rasterList$overwrite = TRUE
     rastXY <- do.call(raster::merge, rasterList)
     if(length(raster::colortable(rastXY)) == 0){
-      rastXY@legend <- raster::nlcdLegend
-    }else{
+      rastXY@legend@colortable <- nlcdLegend
+      }else{
       raster::colortable(rastXY) <- colortable(rasterList[[1]])
     }
     
