@@ -1,10 +1,10 @@
-rmet2 Working Example
+README
 ================
 
 Background
 ----------
 
-This package is designed to assist members of the general public with running US EPA's Meteorological Processors, \[AERMINUTE\]\[<https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm>\], \[AERSURFACE\]\[<https://www3.epa.gov/ttn/scram/dispersion_related.htm#aersurface>\], and \[AERMET\]\[<https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm>\]. Rmet2 provides the following features:
+This package is designed to assist running US EPA's Meteorological Processors, [AERMINUTE](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm), [AERSURFACE](https://www3.epa.gov/ttn/scram/dispersion_related.htm#aersurface), and [AERMET](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm). Rmet2 provides the following features:
 
 -   Automatic Downloading of Meteorological Data from National Oceonographic and Atmospheric Administration (NOAA) websites.
 
@@ -12,28 +12,78 @@ This package is designed to assist members of the general public with running US
 
 -   Caputuring output runstreams and files and producing tables and figures useful for air dispersion modelers to perform quality assurance checks on intermediate and final outputs of the meteorological preprocessors.
 
-Example of usage - Corpus Christi, TX
--------------------------------------
+The package is designed to work with [R](www.r-project.org).
 
-To use rmet2, you will need
+Installation
+------------
+
+In R, the following script will check for, and if needed, install the package [devtools](https://cran.r-project.org/web/packages/devtools/index.html), and then attempt to install rmet2 to your system. You will only have to install rmet2 once on your system, so for normal day-to-day use you will not need to run the installation script:
 
 ``` r
-summary(cars)
+if(!"devtools" %in% installed.packages()) install.pacakges(devtools)
+if(!"rmet2" %in% installed.packages()) devtools::install_git("https://github.com/YoJimboDurant/rmet2")
 ```
 
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
+TO use rmet2, you will type the following into the console:
 
-Including Plots
+``` r
+library(rmet2)
+```
+
+    ## $rmet.aermet
+    ## [1] "aermet"
+    ## 
+    ## $rmet.aerminute
+    ## [1] "aerminute"
+    ## 
+    ## $rmet.aersurface
+    ## [1] "aersurface"
+    ## 
+    ## $rmet.desc
+    ## list()
+    ## 
+    ## $rmet.desc.author
+    ## [1] "\"James Durant <hzd3@cdc.gov> [aut, cre]\""
+    ## 
+    ## $rmet.desc.license
+    ## [1] "MIT"
+    ## 
+    ## $rmet.install.args
+    ## [1] ""
+    ## 
+    ## $rmet.name
+    ## [1] "rmet"
+    ## 
+    ## $rmet.noaa.site
+    ## [1] "http://www1.ncdc.noaa.gov/pub/data/"
+    ## 
+    ## $rmet.noaa.surfhist
+    ## [1] "http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt"
+
+``` r
+installAM()
+```
+
+    ## [1] "downloading aermet"
+    ## [1] "downloading aerminute"
+    ## [1] "downloading aersurface"
+
+    ## NULL
+
+This is the location of the executables.
+
+``` r
+sapply(c("aermet", "aerminute", "aersurface"), getOption)
+```
+
+    ##                                   aermet 
+    ##               "C:/aermet_exe/aermet.exe" 
+    ##                                aerminute 
+    ## "C:/aerminute_15272/aerminute_15272.exe" 
+    ##                               aersurface 
+    ##       "C:/aersurface_exe/aersurface.exe"
+
+Examples usage:
 ---------------
 
-You can also embed plots, for example:
-
-![](README_files/figure-markdown_github/pressure-1.png)
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+[Pittsburg International Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/kpit.md)
