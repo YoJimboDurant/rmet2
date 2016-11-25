@@ -35,14 +35,43 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   if("aersurface" %in% processor){
     
     system(getOption("aersurface"), 
-           input=readLines(rmetObj$inputFiles$aersurface[grepl("aersurface.inp", 
+           input=readLines(rmetObj$inputFiles$aersurface$surface[grepl("aersurface.inp", 
                                                             rmetObj$inputFiles$aersurface)]))
-    rmetObj$output$aersurface <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", sep="/"))
-  }
+    rmetObj$output$aersurface$surface <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", sep="/"))
+
+    
+    if(!is.null(rmetObj$onsite_Latitude) & !is.null(rmetObj$onsite_Latitude)){
+      system(getOption("aersurface"), 
+             input=readLines(rmetObj$inputFiles$aersurface$onsite[grepl("aersurface_onsite.inp", 
+                                                                 rmetObj$inputFiles$aersurface$onsite)]))
+      rmetObj$output$aersurface$onsite <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", 
+                                                           sep="/"))
+      
+      
+    }
+    
+    
+    
+    }
+  
+  
   
   if("aermet1" %in% processor){
   
   lapply(rmetObj$inputText$aermet$s1, function(x) {
+    
+    if(!is.null(rmetObj$onsite_Fstring)){
+      xdates <- stringr::str_extract(
+        x, "XDATES.*[:digit:]")
+      Fstring <- rmetObj$onsite_Fstring
+      Fstring[grepl("XDATES", Fstring)] <- xdates
+      
+      xpath <- stringr::str_extract(x, "  QAOUT.*SFQAOUT.DAT")
+      
+      Fstring[grepl("QAOUT", Fstring)] <- gsub("SFQAOUT.DAT", "OSQAOUT.DSK\"", xpath)
+
+      x <- c(x, Fstring)
+    }
     write(x, file="AERMET.INP")
     system(getOption("aermet"))
   })
@@ -52,6 +81,13 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   if("aermet2" %in% processor){
     
   lapply(rmetObj$inputText$aermet$s2, function(x) {
+    
+    if(!is.null(rmetObj$onsite_Fstring)){
+      
+      xpath <- stringr::str_extract(x, "  QAOUT.*SFQAOUT.DAT")
+      onsiteqa <- gsub("SFQAOUT.DAT", "OSQAOUT.DSK\"", xpath)
+      x <- c(x, "ONSITE", onsiteqa)
+    }
     write(x, file="AERMET.INP")
     system(getOption("aermet"))
   })
@@ -61,7 +97,38 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   if("aermet3" %in% processor){
     
   lapply(seq_along(rmetObj$inputText$aermet$s3), function(i) {
-    write(c(rmetObj$inputText$aermet$s3[[i]], rmetObj$output$aersurface), file="AERMET.INP")
+    if(is.null(rmetObj$inputFiles$aersurface$onsite)){
+    write(c(rmetObj$inputText$aermet$s3[[i]], rmetObj$output$aersurface$surface), file="AERMET.INP")
+    }
+    
+    if(!is.null(rmetObj$inputFiles$aersurface$onsite)){
+      headLines <- grep("^\\*", rmetObj$output$aersurface$surface, value=TRUE)
+      surfaceFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$surface, value=TRUE)
+      onsiteFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$onsite, value=TRUE)
+      onsiteFreqSect <- gsub("FREQ_SECT", "FREQ_SECT2", onsiteFreqSect)
+      
+      surfaceSect <- grep("^   SECTOR", rmetObj$output$aersurface$surface, value=TRUE)
+      onsiteSect <- grep("^   SECTOR", rmetObj$output$aersurface$onsite, 
+                                 value=TRUE)
+      onsiteSect <- gsub("SECTOR", "SECTOR2", onsiteSect)
+      
+      surfaceChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$surface, value=TRUE)
+      onsiteChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$onsite, 
+                          value=TRUE)
+      
+      onsiteChar <- gsub("SITE_CHAR", "SITE_CHAR2", onsiteChar)
+      
+      inpFile <- c(headLines[1:(length(headLines)-1)],
+                   surfaceFreqSect,
+                   surfaceSect,
+                   onsiteFreqSect,
+                   onsiteSect,
+                   headLines[length(headLines)],
+                   surfaceChar,
+                   onsiteChar)
+      #browser()
+      write(c(rmetObj$inputText$aermet$s3[[i]], inpFile), file="AERMET.INP")
+    }
     system(getOption("aermet"))
   })
   

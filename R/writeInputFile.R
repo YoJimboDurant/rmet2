@@ -24,9 +24,19 @@ if("aerminute" %in% type){
 
 if("aersurface" %in% type){
     inpFile <- paste(rmetObj$project_Dir, "aersurface/aersurface.inp", sep="/")
-    write(rmetObj$inputText$aersurface, file= inpFile)
+    write(rmetObj$inputText$aersurface$surface, file= inpFile)
     inpFile <- path.expand(inpFile)
-    rmetObj$inputFiles$aersurface <- inpFile
+    rmetObj$inputFiles$aersurface$surface <- inpFile
+    
+    if(!is.null(rmetObj$onsite_Latitude) & !is.null(rmetObj$onsite_Latitude)){
+    inpFileOS <- paste(rmetObj$project_Dir, "aersurface/aersurface_onsite.inp", sep="/")
+    write(rmetObj$inputText$aersurface$onsite, file= inpFileOS)
+    inpFile <- path.expand(inpFile)
+    rmetObj$inputFiles$aersurface$onsite <- inpFileOS
+    }else{
+      rmetObj$inputFiles$aersurface$onsite <- NULL
+    }
+    
    
     if(dewinter){
       inpFile <- paste(rmetObj$project_Dir, "aersurface/aersurface_dewinter.inp", sep="/")
@@ -38,8 +48,7 @@ if("aersurface" %in% type){
       newObj$inputText$aersurface <- gsub("aersurface.out", "aersurface_dewinter.out", newObj$inputText$aersurface)
       write(newObj$inputText$aersurface, file= inpFile)
       inpFile <- path.expand(inpFile)
-      rmetObj$inputFiles$aersurface <- c(rmetObj$inputFiles$aersurface, inpFile)
-      
+      rmetObj$inputFiles$aersurface$surface <- c(rmetObj$inputFiles$aersurface, inpFile)
     }
   }
 

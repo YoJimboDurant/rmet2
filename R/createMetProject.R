@@ -48,7 +48,10 @@ createMetProject <- function(project_Name,
                              as_Summer,
                              as_Autumn,
                              as_nsector = 12,
-                             as_radius = 1
+                             as_radius = 1,
+                             onsite_Latitude = NULL,
+                             onsite_Longitude = NULL,
+                             onsite_Fstring = NULL
                              
                              ){
   # check if rmet project exists if so load it
@@ -131,7 +134,8 @@ createMetProject <- function(project_Name,
     
       
     #inputFiles
-      inputFiles <-list(aerminute=NULL, aersurface = NULL, aermet= list(s1=NULL,s2=NULL,s3=NULL))
+      inputFiles <-list(aerminute=NULL, aersurface = list(surface = NULL, onsite = NULL), 
+                        aermet= list(s1=NULL,s2=NULL,s3=NULL))
       outputFiles <- list(aerminute=NULL, aersurface = NULL, aermet = list(s1=NULL,s2=NULL,s3=NULL))
     
     aermetProject <- list(project_Name = project_Name,
@@ -154,6 +158,9 @@ createMetProject <- function(project_Name,
                           ua_UTC = ua_UTC,
                           ua_Latitude = ua_Latitude,
                           ua_Longitude = ua_Longitude,
+                          onsite_Latitude = onsite_Latitude,
+                          onsite_Longitude = onsite_Longitude,
+                          onsite_Fstring = onsite_Fstring,
                           ifg = ifg,
                           aersurface = list(
                             inputFiles = list(
@@ -178,7 +185,9 @@ createMetProject <- function(project_Name,
                           as_Autumn = as_Autumn
                           )),
                           inputText = list(aerminute = NULL, 
-                                           aersurface = NULL,
+                                           aersurface = list(
+                                             surface = NULL,
+                                             onsite = NULL),
                                            aermet = NULL),
                           inputFiles =inputFiles,
                           output = outputFiles)
