@@ -60,11 +60,17 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   
   lapply(rmetObj$inputText$aermet$s1, function(x) {
     
+    xInp <- gsub("[.]RPT", ".INP", 
+                 stringr::str_extract(x, 
+                                      "C:/temp/khio_onsite/[:digit:]{4}/S1.RPT"))
+    
+    
     if(!is.null(rmetObj$onsite_Fstring)){
       xdates <- stringr::str_extract(
         x, "XDATES.*[:digit:]")
       Fstring <- rmetObj$onsite_Fstring
-      Fstring[grepl("XDATES", Fstring)] <- xdates
+     
+      Fstring[grepl("XDATES", Fstring)] <- paste0("  ",xdates)
       
       xpath <- stringr::str_extract(x, "  QAOUT.*SFQAOUT.DAT")
       
@@ -74,13 +80,17 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     }
     write(x, file="AERMET.INP")
     system(getOption("aermet"))
+    file.copy("AERMET.INP", xInp, overwrite = TRUE)
+    
   })
   }
-  
   
   if("aermet2" %in% processor){
     
   lapply(rmetObj$inputText$aermet$s2, function(x) {
+    xInp <- gsub("[.]RPT", ".INP", 
+                 stringr::str_extract(x, 
+                                      "C:/temp/khio_onsite/[:digit:]{4}/S2.RPT"))
     
     if(!is.null(rmetObj$onsite_Fstring)){
       
@@ -90,6 +100,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     }
     write(x, file="AERMET.INP")
     system(getOption("aermet"))
+    file.copy("AERMET.INP", xInp, overwrite = TRUE)
   })
   
   }
@@ -97,6 +108,9 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   if("aermet3" %in% processor){
     
   lapply(seq_along(rmetObj$inputText$aermet$s3), function(i) {
+    xInp <- gsub("[.]RPT", ".INP", 
+                 stringr::str_extract(rmetObj$inputText$aermet$s3[[i]], 
+                                      "C:/temp/khio_onsite/[:digit:]{4}/S3.RPT"))
     if(is.null(rmetObj$inputFiles$aersurface$onsite)){
     write(c(rmetObj$inputText$aermet$s3[[i]], rmetObj$output$aersurface$surface), file="AERMET.INP")
     }
@@ -130,6 +144,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
       write(c(rmetObj$inputText$aermet$s3[[i]], inpFile), file="AERMET.INP")
     }
     system(getOption("aermet"))
+    file.copy("AERMET.INP", xInp, overwrite = TRUE)
   })
   
   }

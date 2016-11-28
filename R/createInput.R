@@ -188,6 +188,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
     if(!is.null(rmetObj$onsite_Latitude) & !is.null(rmetObj$onsite_Latitude)){
       as_inpFile$lat = rmetObj$onsite_Latitude
       as_inpFile$long = rmetObj$onsite_Longitude
+      as_inpFile$airport <- "N"
       rmetObj$inputText$aersurface$onsite <- paste(as_inpFile, collapse="\n")
     }
     
