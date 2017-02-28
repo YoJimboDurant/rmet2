@@ -1,8 +1,8 @@
 Package: rmet2
 Type: Package
 Title: Download files and run AERMET
-Version: 0.1
-Date: 2016-05-01
+Version: 0.11
+Date: 2017-02-28
 Author: James Durant
 Maintainer: James Durant to <jamesdrenda@charter.net>
 dependencies: true
@@ -28,7 +28,8 @@ Depends:
     leaflet,
     geosphere,
     readr,
-    ggmap
+    ggmap,
+    httr
 Imports:
 Description: This packages uses R to automate the downloading of NOAA data and
     running US EPA's AERMET system.
