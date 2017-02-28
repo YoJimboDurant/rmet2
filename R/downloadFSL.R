@@ -8,19 +8,16 @@
 #' @export
 
 
-downloadFSL <- function(rmetObj, check=TRUE){
+downloadFSL <- function(rmetObj, ...){
   
   loc_years <- names(rmetObj$td3505_noaa)
   # check is directories exist and if not, create them
   
   
   localFiles <- paste(rmetObj$project_Dir, "/", loc_years,"/", rmetObj$ua_WMO,".FSL", sep="")
-  WMO <- rmetObj$ua_WMO
+  WMO <- stringr::str_pad(rmetObj$ua_WMO,5, pad="0")
   WBAN <- rmetObj$ua_WBAN
   
-  if(check==TRUE){
-    
-    if(!all(sapply(localFiles, file.exists))){
       
       if(!is.null(WMO)){
         for (i in 1:length(loc_years)){
@@ -58,8 +55,8 @@ downloadFSL <- function(rmetObj, check=TRUE){
           
           writeLines(httr::content(qForm, encoding="UTF-8"), localFiles[i])
         }
-      }
-    }
+      
+    
   }else{
     
     if(is.null(WMO)){
