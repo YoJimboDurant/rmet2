@@ -29,9 +29,10 @@ downloadTD3505 <- function (rmetObj, check=TRUE,...) {
                        loc_years[[i]], "/", locFiles)
     
     locExist <- file.exists(locFiles)
-    print(locExist)
     locExist <- !locExist
   })
+  
+  loc_years <- loc_years[!unlist(lapply(locExist, all))]
 
   }
   
