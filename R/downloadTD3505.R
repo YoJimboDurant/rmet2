@@ -32,7 +32,7 @@ downloadTD3505 <- function (rmetObj, check=TRUE,...) {
     locExist <- !locExist
   })
   
-  loc_years <- loc_years[!unlist(lapply(locExist, all))]
+  loc_years <- loc_years[unlist(lapply(locExist, all))]
 
   }
   

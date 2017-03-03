@@ -29,8 +29,8 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
       locExist <- !locExist
     })
     
-    loc_years <- loc_years[!unlist(lapply(locExist, all))]
-    
+    loc_years <- loc_years[unlist(lapply(locExist, all))]
+   
     lapply(seq_along(loc_years), function(i) {
       destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
       
