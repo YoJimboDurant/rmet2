@@ -62,7 +62,8 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     
     xInp <- gsub("[.]RPT", ".INP", 
                  stringr::str_extract(x, 
-                                      "C:/temp/khio_onsite/[:digit:]{4}/S1.RPT"))
+                                      paste(bseye_laff$project_Dir,
+                          "[:digit:]{4}/S1.RPT", sep="/")))
     
     
     if(!is.null(rmetObj$onsite_Fstring)){
@@ -88,10 +89,11 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   if("aermet2" %in% processor){
     
   lapply(rmetObj$inputText$aermet$s2, function(x) {
+    
     xInp <- gsub("[.]RPT", ".INP", 
                  stringr::str_extract(x, 
-                                      "C:/temp/khio_onsite/[:digit:]{4}/S2.RPT"))
-    
+                                      paste(bseye_laff$project_Dir,
+                                            "[:digit:]{4}/S2.RPT", sep="/")))
     if(!is.null(rmetObj$onsite_Fstring)){
       
       xpath <- stringr::str_extract(x, "  QAOUT.*SFQAOUT.DAT")
@@ -108,38 +110,44 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   if("aermet3" %in% processor){
     
   lapply(seq_along(rmetObj$inputText$aermet$s3), function(i) {
+    
     xInp <- gsub("[.]RPT", ".INP", 
-                 stringr::str_extract(rmetObj$inputText$aermet$s3[[i]], 
-                                      "C:/temp/khio_onsite/[:digit:]{4}/S3.RPT"))
+                 stringr::str_extract(x, 
+                                      paste(bseye_laff$project_Dir,
+                                            "[:digit:]{4}/S3.RPT", sep="/")))
     if(is.null(rmetObj$inputFiles$aersurface$onsite)){
     write(c(rmetObj$inputText$aermet$s3[[i]], rmetObj$output$aersurface$surface), file="AERMET.INP")
     }
     
     if(!is.null(rmetObj$inputFiles$aersurface$onsite)){
       headLines <- grep("^\\*", rmetObj$output$aersurface$surface, value=TRUE)
+      
       surfaceFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$surface, value=TRUE)
+      surfaceFreqSect <- gsub("FREQ_SECT", "FREQ_SECT2", surfaceFreqSect)
       onsiteFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$onsite, value=TRUE)
-      onsiteFreqSect <- gsub("FREQ_SECT", "FREQ_SECT2", onsiteFreqSect)
       
       surfaceSect <- grep("^   SECTOR", rmetObj$output$aersurface$surface, value=TRUE)
+      surfaceSect <- gsub("SECTOR", "SECTOR2", surfaceSect)
+      
       onsiteSect <- grep("^   SECTOR", rmetObj$output$aersurface$onsite, 
                                  value=TRUE)
-      onsiteSect <- gsub("SECTOR", "SECTOR2", onsiteSect)
       
       surfaceChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$surface, value=TRUE)
+      surfaceChar <- gsub("SITE_CHAR", "SITE_CHAR2", surfaceChar)
+      
       onsiteChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$onsite, 
                           value=TRUE)
       
-      onsiteChar <- gsub("SITE_CHAR", "SITE_CHAR2", onsiteChar)
       
       inpFile <- c(headLines[1:(length(headLines)-1)],
-                   surfaceFreqSect,
-                   surfaceSect,
                    onsiteFreqSect,
                    onsiteSect,
+                   surfaceFreqSect,
+                   surfaceSect,
                    headLines[length(headLines)],
-                   surfaceChar,
-                   onsiteChar)
+                   onsiteChar,
+                   surfaceChar
+)
       #browser()
       write(c(rmetObj$inputText$aermet$s3[[i]], inpFile), file="AERMET.INP")
     }
