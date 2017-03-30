@@ -62,7 +62,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     
     xInp <- gsub("[.]RPT", ".INP", 
                  stringr::str_extract(x, 
-                                      paste(bseye_laff$project_Dir,
+                                      paste(rmetObj$project_Dir,
                           "[:digit:]{4}/S1.RPT", sep="/")))
     
     
@@ -92,7 +92,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     
     xInp <- gsub("[.]RPT", ".INP", 
                  stringr::str_extract(x, 
-                                      paste(bseye_laff$project_Dir,
+                                      paste(rmetObj$project_Dir,
                                             "[:digit:]{4}/S2.RPT", sep="/")))
     if(!is.null(rmetObj$onsite_Fstring)){
       
@@ -112,8 +112,8 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   lapply(seq_along(rmetObj$inputText$aermet$s3), function(i) {
     
     xInp <- gsub("[.]RPT", ".INP", 
-                 stringr::str_extract(x, 
-                                      paste(bseye_laff$project_Dir,
+                 stringr::str_extract(rmetObj$inputText$aermet$s3[[i]], 
+                                      paste(rmetObj$project_Dir,
                                             "[:digit:]{4}/S3.RPT", sep="/")))
     if(is.null(rmetObj$inputFiles$aersurface$onsite)){
     write(c(rmetObj$inputText$aermet$s3[[i]], rmetObj$output$aersurface$surface), file="AERMET.INP")
