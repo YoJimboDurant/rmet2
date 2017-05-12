@@ -25,7 +25,7 @@ downloadFSL <- function(rmetObj, ...){
           d1 <- as.numeric(paste(loc_years[i], "010000", sep=""))
           d2 <- as.numeric(
             paste0(
-              format(rmetObj$start_Date, "%Y%m%d", tz="UTC"),
+              format(rmetObj$start_Date - 24 * 60 * 60, "%Y%m%d", tz="UTC"),
               "00")
           )
           
@@ -34,7 +34,7 @@ downloadFSL <- function(rmetObj, ...){
           e1 <- as.numeric(paste(as.numeric(loc_years[i])+1, "010100", sep=""))
           e2 <- as.numeric(
             paste0(
-              format(rmetObj$end_Date, "%Y%m%d", tz="UTC"),
+              format(rmetObj$end_Date + 24 * 60 * 60, "%Y%m%d", tz="UTC"),
               "00")
           )
           
@@ -66,7 +66,7 @@ downloadFSL <- function(rmetObj, ...){
         d1 <- as.numeric(paste(loc_years[i], "010000", sep=""))
         d2 <- as.numeric(
           paste0(
-            format(rmetObj$start_Date, "%Y%m%d", tz="UTC"),
+            format(rmetObj$start_Date - 24 * 60 * 60, "%Y%m%d", tz="UTC"),
             "00")
         )
         
@@ -75,7 +75,7 @@ downloadFSL <- function(rmetObj, ...){
         e1 <- as.numeric(paste(as.numeric(loc_years[i])+1, "010100", sep=""))
         e2 <- as.numeric(
           paste0(
-            format(rmetObj$end_Date, "%Y%m%d", tz="UTC"),
+            format(rmetObj$end_Date + 24 * 60 * 60, "%Y%m%d", tz="UTC"),
             "00")
         )
         

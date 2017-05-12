@@ -18,11 +18,7 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
   require(stringr)
 
   
-  if (R.version$os !="linux-gnu"){
-    setInternet2(use = NA) 
-  }
-  
-  
+
   #readLines from html to get the latest version of AERMET, AERSURFACE and AERMINUTE
   
   scramLines <- readLines("https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm", warn=FALSE)
