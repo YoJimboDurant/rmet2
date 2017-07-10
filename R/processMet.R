@@ -36,7 +36,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     
     system(getOption("aersurface"), 
            input=readLines(rmetObj$inputFiles$aersurface$surface[grepl("aersurface.inp", 
-                                                            rmetObj$inputFiles$aersurface)]))
+                                                            unlist(rmetObj$inputFiles$aersurface))]))
     rmetObj$output$aersurface$surface <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", sep="/"))
 
     

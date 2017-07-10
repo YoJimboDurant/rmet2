@@ -48,7 +48,7 @@ if("aersurface" %in% type){
       newObj$inputText$aersurface <- gsub("aersurface.out", "aersurface_dewinter.out", newObj$inputText$aersurface)
       write(newObj$inputText$aersurface, file= inpFile)
       inpFile <- path.expand(inpFile)
-      rmetObj$inputFiles$aersurface$surface <- c(rmetObj$inputFiles$aersurface, inpFile)
+      rmetObj$inputFiles$aersurface$surface[2] <- inpFile
     }
   }
 
