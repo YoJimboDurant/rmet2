@@ -8,12 +8,30 @@
 
 
 createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1",
-                                             "aermet2", "aermet3"), ustar=TRUE){
+                                             "aermet2", "aermet3"), ustar = TRUE, inputOps = list(S1 =
+                                                                                      list(),
+                                                                                    S2 = list(),
+                                                                                    S3 = list(other = list(
+                                                                                      "THRESH_1MIN 0.5"
+                                                                                      ),method = list(
+                                                                                      "REFLEVEL SUBNWS",
+                                                                                      "STABLEBL ADJ_U*"
+                                                                                      ))
+                                                                                    )
+                             ){
  # type <- match.arg(type)
   stopifnot(class(rmetObj) =="rmet")
   stopifnot(all(type %in% c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3")))
   missAerminute <- all(c(sapply(rmetObj$td6401_noaa, function(x) length(x)==0),
                        sapply(rmetObj$td6405_noaa, function(x) length(x)==0)))
+  if(!is.null(ustar)){
+    if("STABLEBL ADJ_U*" %in% inputOps$S3$method & ustar) ustar_problem = FALSE
+    if(!"STABLEBL ADJ_U*" %in% inputOps$S3$method & !ustar) ustar_problem = FALSE
+    if(!"STABLEBL ADJ_U*" %in% inputOps$S3$method & ustar) ustar_problem = TRUE
+    if("STABLEBL ADJ_U*" %in% inputOps$S3$method & !ustar) ustar_problem = TRUE
+    if(ustar_problem) stop("Incompatable USTAR arguements in stage 3.")
+  } 
+  
   if(missAerminute){
     warning("No TD6401 Files and TD6405 Files - no aerminute inputs created!")
     type <- type[type !="aerminute"]
@@ -305,10 +323,8 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
           "**",
           paste0("  XDATES        ", xdates2[[i]]),
           paste0("  DATA          ", prepareThePath(paste(destDir[[i]], "AMS2_ISHD.MRG", sep="/"))),
-          "  METHOD   REFLEVEL SUBNWS",
-          "  METHOD   WIND_DIR  RANDOM",
-          if(ustar) {"  METHOD   STABLEBL ADJ_U*"
-          },
+          paste0(paste0("  ", inputOps$S3$other), collapse = "\n"),
+          paste0(paste0("  METHOD        ", inputOps$S3$method),collapse = "\n"),
           paste0("  NWS_HGT    ", "WIND ", rmetObj$surf_AnenometerHeight),
           paste0("  OUTPUT        ", prepareThePath(paste(destDir[[i]], paste0("AM_",loc_years[[i]],".SFC"),
                                                           sep="/"))),
