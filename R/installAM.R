@@ -17,20 +17,11 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
   require(downloader)
   require(stringr)
 
-  
+  if(!grepl("/$", rootDir)) rootDir <- paste0(rootDir, "/")
 
-  #readLines from html to get the latest version of AERMET, AERSURFACE and AERMINUTE
-  
-  scramLines <- readLines("https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm", warn=FALSE)
-  
   #aerminutedownload
-  aerminuteLink <- grep("aerminute_.*?[.]zip", scramLines, value=TRUE)
-  aerminuteLink <- str_extract(aerminuteLink, "/ttn/scram/7thconf/aermod/aerminute_.*?[.]zip")
-  aerminuteLink <- paste0("https://www3.epa.gov", aerminuteLink)
-  
-  aerminuteVersion <- str_extract(aerminuteLink, "[0-9]{5}")
-  aerminOut <- paste0(rootDir,"aerminute_",aerminuteVersion)
-  
+  aerminuteLink <- "https://www3.epa.gov/ttn/scram/7thconf/aermod/aerminute_15272.zip"
+  aerminuteVersion <- stringr::str_extract(aerminuteLink, "[0-9]{5}")
   programTree <- list(
     aermetEx = paste0(rootDir,"aermet_exe"),
     aerminEx = paste0(rootDir,"aerminute_",aerminuteVersion),
