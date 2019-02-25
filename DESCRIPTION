@@ -21,7 +21,6 @@ Depends:
     openair,
     RadioSonde,
     R.utils,
-    weatherData,
     lubridate,
     gdata,
     sp,
