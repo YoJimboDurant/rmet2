@@ -179,6 +179,16 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
       asMoisture =rmetObj$aersurface$surfaceChar$as_Moisture
     )
     
+    if(grepl("[.]bin\"$", as_inpFile$lcFile)){
+      indx <- sapply(state.name, function(x) grepl(x, as_inpFile$lcFile, ignore.case=TRUE))
+       if(any(indx)) {
+         as_inpFile <- append(as_inpFile, state.abb[indx], after = 1)
+       } else {
+         warning("Cannot find the state appreviation - you must manually append to input.")
+       }
+       
+    }
+    
     if(as_inpFile$asSnow == "N") {
       if(!is.null(as_inpFile$asWinterWS)){
         stop(paste("AERSURFACE Option No Snow but Winter With Snow months in input file", as_inpFile$asWinterWS))
@@ -242,8 +252,8 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
         "  AUDIT          SLVP PRES CLHT TSKC PWTH ASKY HZVS RHUM",
         "  RANGE TMPD  -300  <=  450  999",
         paste0("  XDATES        ", xdates[[i]]),
-        paste("  LOCATION     ", rmetObj$surf_WBAN, convertLat(rmetObj$surf_Latitude), 
-              convertLong(rmetObj$surf_Longitude), -(rmetObj$surf_UTC), 
+        paste("  LOCATION     ", rmetObj$surf_WBAN, convertLat(round(rmetObj$surf_Latitude,3)), 
+              convertLong(round(rmetObj$surf_Longitude,3)), -(rmetObj$surf_UTC), 
               rmetObj$surf_Elevation),
         paste0("  QAOUT        ", prepareThePath(ishqaoutFiles[[i]])),
         "  NO_MISSING           ASKY TSKC"

@@ -19,7 +19,7 @@ downloadTD3505 <- function (rmetObj, check=TRUE,...) {
   
   loc_years <- locYears(rmetObj)
   locExist <- lapply(seq_along(loc_years), function(i){
-    locFiles <- gsub ("http://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}/",
+    locFiles <- gsub ("https://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}/",
            "S", rmetObj$td3505_noaa[[i]])
     locFiles <- substring(locFiles, 1, 14)
     locFiles <- gsub("-", "", locFiles)

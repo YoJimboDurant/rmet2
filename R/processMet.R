@@ -79,7 +79,8 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
 
       x <- c(x, Fstring)
     }
-    write(x, file="AERMET.INP")
+    #browser()
+    write(x, file="./AERMET.INP")
     system(getOption("aermet"))
     file.copy("AERMET.INP", xInp, overwrite = TRUE)
     
