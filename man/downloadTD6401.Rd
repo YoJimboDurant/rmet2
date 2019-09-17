@@ -4,7 +4,7 @@
 \alias{downloadTD6401}
 \title{downloadTD6401}
 \usage{
-downloadTD6401(rmetObj, ...)
+downloadTD6401(rmetObj, check = TRUE, ...)
 }
 \description{
 \code{downloadTD6401} Boo!
@@ -12,4 +12,3 @@ downloadTD6401(rmetObj, ...)
 The function is designed to perform basic checks to make sure that 
 the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})
 }
-

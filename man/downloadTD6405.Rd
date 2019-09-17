@@ -4,7 +4,10 @@
 \alias{downloadTD6405}
 \title{downloadTD6405}
 \usage{
-downloadTD6405(rmetObj, ...)
+downloadTD6405(rmetObj, check = TRUE, ...)
+}
+\arguments{
+\item{rmetObj}{is valid rmetObject created by createMetProject}
 }
 \description{
 \code{downloadTD6405} Boo!
@@ -12,4 +15,3 @@ downloadTD6405(rmetObj, ...)
 The function is designed to perform basic checks to make sure that 
 the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})
 }
-
