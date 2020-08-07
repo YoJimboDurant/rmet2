@@ -28,7 +28,8 @@ Depends:
     geosphere,
     readr,
     ggmap,
-    httr
+    httr,
+    tmaptools
 Imports:
 Description: This packages uses R to automate the downloading of NOAA data and
     running US EPA's AERMET system.

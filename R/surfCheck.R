@@ -40,7 +40,10 @@ surfCheck <- function(rmetObj, outfile="surfaceFile.pdf", file.choose=FALSE,
     
     # use ISOdate( ) to convert strings to dates
     # 
-    adjustment<-0
+
+    adjustment <- 0
+    
+
     
     
     date <- lubridate::ymd_h(paste(surface_file_1$year+adjustment,surface_file_1$month,surface_file_1$day, surface_file_1$hour-1), 

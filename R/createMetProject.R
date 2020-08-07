@@ -130,8 +130,8 @@ createMetProject <- function(project_Name,
     
     #Here we identify which files we need to download data from noaa database
       td3505_noaa <- rmet2:::checkTD3505(start_Date, end_Date, surf_USAF, surf_WBAN)
-      td6405_noaa <- rmet2:::checkTD6405(start_Date, end_Date, surf_Call)
-      td6401_noaa <- rmet2:::checkTD6401(start_Date, end_Date, surf_Call)
+      td6405_noaa <- try(rmet2:::checkTD6405(start_Date, end_Date, surf_Call))
+      td6401_noaa <- try(rmet2:::checkTD6401(start_Date, end_Date, surf_Call))
     
       
     #inputFiles

@@ -104,7 +104,7 @@ surfaceReader <- function(sfile, rmetObj){
   
   
   date<-lubridate::ymd_h(paste(surface_file_1$year+adjustment,surface_file_1$month,surface_file_1$day, surface_file_1$hour-1), tz=paste0("Etc/GMT+", -rmetObj$surf_UTC))
-#  date <-strptime(as.character(date), "%Y-%m-%d")   #change the date field to a internal form for time dates
+  #  date <-strptime(as.character(date), "%Y-%m-%d")   #change the date field to a internal form for time dates
   
   surface_file_1<-cbind(seq_hour, surface_file_1)
   surface_file_1<-cbind(date, surface_file_1)
