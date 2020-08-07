@@ -9,7 +9,7 @@ checkTD6405 <- function(start_Date, end_Date,  surf_Call){
   xtz <- lubridate::tz(start_Date)
   startYear <- as.numeric(format(start_Date, "%Y", tz=xtz))
   endYear <- as.numeric(format(end_Date, "%Y", tz=xtz))
-  stopifnot(endYear>startYear)
+  stopifnot(endYear>=startYear)
   
   
   
@@ -22,8 +22,8 @@ checkTD6405 <- function(start_Date, end_Date,  surf_Call){
       ".dat")
   })
   
-  checkTD6405 <- sapply(fileName, RCurl::url.exists)
-  if(any(!checkTD6405)){
+  checkTD6405 <- sapply(fileName, httr::http_error)
+  if(any(checkTD6405)){
     warning(paste("Missing file on NOAA site:\n", fileName[!checkTD6405], "\n"))
   }
   

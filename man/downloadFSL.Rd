@@ -4,11 +4,10 @@
 \alias{downloadFSL}
 \title{downloadFSL}
 \usage{
-downloadFSL(rmetObj)
+downloadFSL(rmetObj, ...)
 }
 \description{
 \code{downloadFSL} querries raob database at
 \url{http://www.esrl.noaa.gov/raobs/intl/GetRaobs.cgi}. 
-It then places the resulting text files in subdirectories by year as .FSL files. A comment.
+It then places the resulting text files in subdirectories by year as .FSL files.
 }
-

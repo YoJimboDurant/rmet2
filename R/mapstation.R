@@ -27,10 +27,10 @@ mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
   stations <- stations[stations$LON>-360,]
   
   # Get coord of point of interest
-  coord <- ggmap::geocode(site)
+  coord <- tmaptools::geocode_OSM(site)$coord
   
   #Calculate distance between site and stations
-  stations$dist <- as.vector(geosphere::distm(as.matrix(coord),
+  stations$dist <- as.vector(geosphere::distm(matrix(coord, nrow = 1),
                                               as.matrix(stations[, c("LON", "LAT")])))
   
   # Filter stations to only those where the distance is less than "farthest"
@@ -59,14 +59,14 @@ mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
       addMarkers(label=~label,
                           labelOptions = labelOptions(
                             noHide = 'T')) %>%
-      addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+      addCircleMarkers(coord["x"],coord["y"],fillColor = "red",color="red")
   }
   
   if(engine=="leaflet" & labels == "popup"){
     map <- leaflet::leaflet(sdf) %>%
       addTiles() %>%
       addMarkers(label=~label, labelOptions = labelOptions(clickable = TRUE)) %>%
-      addCircleMarkers(coord$lon,coord$lat,fillColor = "red",color="red")
+      addCircleMarkers(coord["x"],coord["y"],fillColor = "red",color="red")
   }
   
   

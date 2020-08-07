@@ -17,8 +17,8 @@ checkTD3505 <- function(start_Date, end_Date, surf_USAF, surf_WBAN){
         ".gz")
     })
 
-    checkTD3505 <- sapply(fileName, RCurl::url.exists)
-    if(any(!checkTD3505)){
+    checkTD3505 <- sapply(fileName, httr::http_error)
+    if(any(checkTD3505)){
       stop(paste("Missing file on NOAA site:\n", fileName[!checkTD3505]))
     }
     
