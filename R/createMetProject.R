@@ -48,14 +48,28 @@ createMetProject <- function(project_Name,
                              as_Spring,
                              as_Summer,
                              as_Autumn,
-                             as_nsector = 12,
+                             as_nsector = NULL,
                              as_radius = 1,
+                             nws_sector = data.frame(
+                               index = 1:12,
+                               start = seq(0,330,30),
+                               end = seq(30,360,30),
+                               ap = rep("AP", 12)
+                             ),
+                             os_sector = data.frame(
+                               index = 1:12,
+                               start = seq(0,330,30),
+                               end = seq(30,360,30),
+                               ap = rep("NONAP", 12)
+                               ),
                              onsite_Latitude = NULL,
                              onsite_Longitude = NULL,
                              onsite_Fstring = NULL
                              
                              ){
   # check if rmet project exists if so load it
+  
+  if(!is.null(as_nsector)) warning("as_nsector is being depreciated and will not be used unless AERSURFACE < 13016")
   
   rmetFile <- paste(project_Dir, paste0(
     make.names(project_Name),
@@ -177,8 +191,10 @@ createMetProject <- function(project_Name,
                               as_Arid = as_Arid,
                               as_Moisture = as_Moisture,
                               as_Airport = as_Airport,
-                              as_nsector = 12,
-                              as_radius = 1),
+                              as_nsector = as_nsector,
+                              as_radius = as_radius,
+                              nws_sector = nws_sector,
+                              os_sector = os_sector),
                             surfaceSeason = list(
                           as_Winter_NS = as_Winter_NS,
                           as_Winter_WS = as_Winter_WS,

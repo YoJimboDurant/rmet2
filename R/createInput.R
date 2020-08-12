@@ -7,7 +7,8 @@
 
 
 
-createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1",
+createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aersurface_os",
+                                             "aermet1",
                                              "aermet2", "aermet3"), ustar = TRUE, inputOps = list(S1 =
                                                                                       list(),
                                                                                     S2 = list(),
@@ -21,7 +22,8 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
                              ){
  # type <- match.arg(type)
   stopifnot(class(rmetObj) =="rmet")
-  stopifnot(all(type %in% c("aerminute", "aersurface", "aermet1", "aermet2", "aermet3")))
+  stopifnot(all(type %in% c("aerminute", "aersurface", "aersurface_nws", "aersurface_os",
+                            "aermet1", "aermet2", "aermet3")))
   missAerminute <- all(c(sapply(rmetObj$td6401_noaa, function(x) length(x)==0),
                        sapply(rmetObj$td6405_noaa, function(x) length(x)==0)))
   if(!is.null(ustar)){
@@ -151,6 +153,244 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface", "aermet1
       }
         )
   }
+  
+  
+  if("aersurface_nws" %in% type){
+    if("aersurface" %in% type) stop("Cannot run AERSURFACE and AERSURFACE_NWS.")
+    
+    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_File))
+    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_Type))
+
+    control = list(
+      "CO STARTING",
+      paste("   TITLEONE", rmetObj$project_Name, "AERSURFACE NWS INPUT CONTROL FILE", sep = "  "), 
+      paste("   TITLETWO", rmetObj$project_Dir, "Directory", sep = "  "),
+      "** Using default options for OPTIONS keyword and parameters", sep = "  ")
+    if(is.null(c(
+      rmetObj$onsite_Latitude, 
+      rmetObj$onsite_Longitude,
+      rmetObj$onsite_Fstring)
+      )
+    ){  
+      control <- c(control, "   OPTIONS   PRIMARY  ZORAD")
+    }else{
+      control <- c(control, "   OPTIONS   SECONDARY  ZORAD") 
+    }
+  
+    control <- c(control, 
+                 "   DEBUG  GRID  TIFF",
+                 paste("   CENTERLL ", rmetObj$surf_Latitude, rmetObj$surf_Longitude, "NAD83")
+    )
+      
+
+  
+  doUdoWindows <- Sys.info()['sysname'] == "Windows"
+  
+  
+  inputFile_mx <- matrix(rev(rmetObj$aersurface$inputFiles[!sapply(rmetObj$aersurface$inputFiles, is.null)]), ncol = 2, byrow = TRUE)
+  
+  inputFile_mx[,2] <- paste0("\"", inputFile_mx[,2], "\"")
+  dataControl <- paste("   DATAFILE ", apply(inputFile_mx, 1, paste, collapse = "  "))
+  
+  control <- c(control, dataControl)
+  
+  control <- c(control,
+               "** Use default specified km radius",
+               paste("   ZORADIUS ", rmetObj$aersurface$surfaceChar$as_radius)
+  )
+  
+  
+  control <- c(
+    control, 
+    paste("   FREQ_SECT", "MONTHLY", dim(rmetObj$aersurface$surfaceChar$nws_sector)[[1]], "VARYAP", sep = "  "  ),
+    "**        index  start    end      "
+  )
+ 
+  
+  
+  freq_dfx <- cbind("   SECTOR  ", 
+        rmetObj$aersurface$surfaceChar$nws_sector)
+  
+  freq_dfx$start <- sprintf("%7.2f", freq_dfx$start)
+  freq_dfx$end <- sprintf("%7.2f", freq_dfx$end)
+  freq_dfx$ap <- paste("   ", freq_dfx$ap)
+  
+  control <- c(control, gsub(",", "", apply(freq_dfx, 1, toString)))
+  
+  if(!is.null(rmetObj$aersurface$surfaceSeason$as_Winter_NS)){
+    control <- c(control, 
+                 paste("   SEASON   WINTERNS  ", rmetObj$aersurface$surfaceSeason$as_Winter_NS)
+    )
+  }
+  
+    if(!is.null(rmetObj$aersurface$surfaceSeason$as_Winter_WS)){
+      control <- c(control, 
+                   paste("   SEASON   WINTERWS  ", rmetObj$aersurface$surfaceSeason$as_Winter_WS)
+      )
+      
+      
+      
+    }  
+    
+  control <- c( control, 
+                paste("   SEASON   SPRING    ", rmetObj$aersurface$surfaceSeason$as_Spring),
+                paste("   SEASON   SUMMER    ", rmetObj$aersurface$surfaceSeason$as_Summer),
+                paste("   SEASON   AUTUMN    ", rmetObj$aersurface$surfaceSeason$as_Autumn),
+                "   RUNORNOT  RUN",
+                "CO FINISHED")
+  
+  ouput <- list(
+    "** OUTPUT",
+    "OU STARTING",
+    paste0("   SFCCHAR    \"", rmetObj$project_Dir, "/aersurface/nws_sfc_chars.out\""),
+    paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_lc_tif_dbg.txt\""),
+    paste0("   NLCDGRID   \"", rmetObj$project_Dir, "./aersurface/nws_landcover.txt\""))
+  
+  if(!is.null(rmetObj$aersurface$inputFiles$imp_File)){
+    output <- c(output,
+    paste0("   MPRVGRID   \"", rmetObj$project_Dir, "/aersurface/nws_imp_tif_dbg.txt\""),
+    paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_impervious.txt\"")
+    )
+  }
+ if(!is.null(rmetObj$aersurface$inputFiles$cnpy_File)){
+   output <- c(output,
+   paste0("   CNPYGRID   \"", rmetObj$project_Dir, "/aersurface/nws_can_tif_dbg.txt\""),
+   paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_canopy.txt\"")
+   )             
+   
+  }
+  ouput <- c(ouput, 
+             "OU FINISHED")
+  
+    rmetObj$inputFiles$aersurface$surface <- 
+      paste(
+         c(control, ouput),
+        collapse = "\n")
+    
+    if(doUdoWindows){
+      
+      rmetObj$inputFiles$aersurface$surface <- gsub("/", "\\\\", rmetObj$inputFiles$aersurface$surface)
+      
+    }
+  }
+  
+# AERSURFACE OS
+  
+  if("aersurface_os" %in% type){
+    if("aersurface" %in% type) stop("Cannot run AERSURFACE and AERSURFACE_os.")
+    
+    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_File))
+    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_Type))
+    
+    control = list(
+      "CO STARTING",
+      paste("   TITLEONE", rmetObj$project_Name, "AERSURFACE ONSITE INPUT CONTROL FILE", sep = "  "), 
+      paste("   TITLETWO", rmetObj$project_Dir, "Directory", sep = "  "),
+      "** Using default options for OPTIONS keyword and parameters", sep = "  ")
+      control <- c(control, "   OPTIONS   PRIMARY  ZORAD")
+
+      control <- c(control, 
+                 "   DEBUG  GRID  TIFF",
+                 paste("   CENTERLL ", rmetObj$onsite_Latitude, rmetObj$onsite_Longitude, "NAD83")
+    )
+    
+    
+    
+    doUdoWindows <- Sys.info()['sysname'] == "Windows"
+    
+    
+    inputFile_mx <- matrix(rev(rmetObj$aersurface$inputFiles[!sapply(rmetObj$aersurface$inputFiles, is.null)]), ncol = 2, byrow = TRUE)
+    
+    inputFile_mx[,2] <- paste0("\"", inputFile_mx[,2], "\"")
+    dataControl <- paste("   DATAFILE ", apply(inputFile_mx, 1, paste, collapse = "  "))
+    
+    control <- c(control, dataControl)
+    
+    control <- c(control,
+                 "** Use default specified km radius",
+                 paste("   ZORADIUS ", rmetObj$aersurface$surfaceChar$as_radius)
+    )
+    
+    
+    control <- c(
+      control, 
+      paste("   FREQ_SECT", "MONTHLY", dim(rmetObj$aersurface$surfaceChar$os_sector)[[1]], "VARYAP", sep = "  "  ),
+      "**        index  start    end      "
+    )
+    
+    
+    
+    freq_dfx <- cbind("   SECTOR  ", 
+                      rmetObj$aersurface$surfaceChar$os_sector)
+    
+    freq_dfx$start <- sprintf("%7.2f", freq_dfx$start)
+    freq_dfx$end <- sprintf("%7.2f", freq_dfx$end)
+    freq_dfx$ap <- paste("   ", freq_dfx$ap)
+    
+    control <- c(control, gsub(",", "", apply(freq_dfx, 1, toString)))
+    
+    if(!is.null(rmetObj$aersurface$surfaceSeason$as_Winter_NS)){
+      control <- c(control, 
+                   paste("   SEASON   WINTERNS  ", rmetObj$aersurface$surfaceSeason$as_Winter_NS)
+      )
+    }
+    
+    if(!is.null(rmetObj$aersurface$surfaceSeason$as_Winter_WS)){
+      control <- c(control, 
+                   paste("   SEASON   WINTERWS  ", rmetObj$aersurface$surfaceSeason$as_Winter_WS)
+      )
+      
+      
+      
+    }  
+    
+    control <- c( control, 
+                  paste("   SEASON   SPRING    ", rmetObj$aersurface$surfaceSeason$as_Spring),
+                  paste("   SEASON   SUMMER    ", rmetObj$aersurface$surfaceSeason$as_Summer),
+                  paste("   SEASON   AUTUMN    ", rmetObj$aersurface$surfaceSeason$as_Autumn),
+                  "   RUNORNOT  RUN",
+                  "CO FINISHED")
+    
+    ouput <- list(
+      "** OUTPUT",
+      "OU STARTING",
+      paste0("   SFCCHAR    \"", rmetObj$project_Dir, "/aersurface/os_sfc_chars.out\""),
+      paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/os_lc_tif_dbg.txt\""),
+      paste0("   NLCDGRID   \"", rmetObj$project_Dir, "./aersurface/os_landcover.txt\""))
+    
+    if(!is.null(rmetObj$aersurface$inputFiles$imp_File)){
+      output <- c(output,
+                  paste0("   MPRVGRID   \"", rmetObj$project_Dir, "/aersurface/os_imp_tif_dbg.txt\""),
+                  paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/os_impervious.txt\"")
+      )
+    }
+    if(!is.null(rmetObj$aersurface$inputFiles$cnpy_File)){
+      output <- c(output,
+                  paste0("   CNPYGRID   \"", rmetObj$project_Dir, "/aersurface/os_can_tif_dbg.txt\""),
+                  paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/os_canopy.txt\"")
+      )             
+      
+    }
+    ouput <- c(ouput, 
+               "OU FINISHED")
+    
+    rmetObj$inputFiles$aersurface$onsite <- 
+      paste(
+        c(control, ouput),
+        collapse = "\n")
+    
+    if(doUdoWindows){
+      
+      rmetObj$inputFiles$aersurface$surface <- gsub("/", "\\\\", rmetObj$inputFiles$aersurface$surface)
+      
+    }
+  }
+  
+  
+    
+ 
+  
+  
   
   if("aersurface" %in% type){
   

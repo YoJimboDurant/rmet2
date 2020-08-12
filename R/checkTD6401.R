@@ -24,7 +24,7 @@ checkTD6401 <- function(start_Date, end_Date,  surf_Call){
     warning(paste("Missing file on NOAA site:\n", fileName[!checkTD6401], "\n"))
   }
   
-  fileName <- fileName[checkTD6401]
+  fileName <- fileName[!checkTD6401]
   
   fileNames <- plyr::llply(unique(years), function(x){
     grep(x, fileName, value=TRUE)
