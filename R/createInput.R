@@ -76,7 +76,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
   xdates2 <- paste(sxDates, exDates2, sep=" TO ")
   
   if("aerminute" %in% type){
-        print("Writing AERMINUTE inpute files:\n")
+        print("Writing AERMINUTE input text:\n")
         
         
         
@@ -156,10 +156,12 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
   
   
   if("aersurface_nws" %in% type){
+    
+    print("Writing AERSURFACE NWS input text:\n")
     if("aersurface" %in% type) stop("Cannot run AERSURFACE and AERSURFACE_NWS.")
     
     stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_File))
-    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_Type))
+    stopifnot(!is.null(rmetObj$aersurface$inputFiles$lc_Type))
 
     control = list(
       "CO STARTING",
@@ -178,7 +180,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
     }
   
     control <- c(control, 
-                 "   DEBUG  GRID  TIFF",
+                 "   DEBUGOPT  GRID  TIFF",
                  paste("   CENTERLL ", rmetObj$surf_Latitude, rmetObj$surf_Longitude, "NAD83")
     )
       
@@ -262,14 +264,14 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
   ouput <- c(ouput, 
              "OU FINISHED")
   
-    rmetObj$inputFiles$aersurface$surface <- 
+    rmetObj$inputText$aersurface$surface <- 
       paste(
          c(control, ouput),
         collapse = "\n")
     
     if(doUdoWindows){
       
-      rmetObj$inputFiles$aersurface$surface <- gsub("/", "\\\\", rmetObj$inputFiles$aersurface$surface)
+      rmetObj$inputText$aersurface$surface <- gsub("/", "\\\\", rmetObj$inputText$aersurface$surface)
       
     }
   }
@@ -277,10 +279,12 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
 # AERSURFACE OS
   
   if("aersurface_os" %in% type){
+    print("Writing AERSURFACE OS input text:\n")
+    
     if("aersurface" %in% type) stop("Cannot run AERSURFACE and AERSURFACE_os.")
     
     stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_File))
-    stopifnot(file.exists(rmetObj$aersurface$inputFiles$lc_Type))
+    stopifnot(!is.null(rmetObj$aersurface$inputFiles$lc_Type))
     
     control = list(
       "CO STARTING",
@@ -290,7 +294,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
       control <- c(control, "   OPTIONS   PRIMARY  ZORAD")
 
       control <- c(control, 
-                 "   DEBUG  GRID  TIFF",
+                 "   DEBUGOPT  GRID  TIFF",
                  paste("   CENTERLL ", rmetObj$onsite_Latitude, rmetObj$onsite_Longitude, "NAD83")
     )
     
@@ -374,14 +378,14 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
     ouput <- c(ouput, 
                "OU FINISHED")
     
-    rmetObj$inputFiles$aersurface$onsite <- 
+    rmetObj$inputText$aersurface$onsite <- 
       paste(
         c(control, ouput),
         collapse = "\n")
     
     if(doUdoWindows){
       
-      rmetObj$inputFiles$aersurface$surface <- gsub("/", "\\\\", rmetObj$inputFiles$aersurface$surface)
+      rmetObj$inputText$aersurface$onsite <- gsub("/", "\\\\", rmetObj$inputText$aersurface$onsite)
       
     }
   }
