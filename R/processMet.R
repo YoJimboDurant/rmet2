@@ -7,7 +7,7 @@
 #' @export
 
 processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet1",
-                                              "aermet2", "aermet3")){
+                                              "aermet2", "aermet3"), newaersurface = TRUE){
   
   stopifnot(processor %in% c("aerminute", "aersurface", "aermet1", 
                              "aermet2", "aermet3"))
@@ -32,27 +32,47 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
   )
   }
   
-  if("aersurface" %in% processor){
-    
-    system(getOption("aersurface"), 
-           input=readLines(rmetObj$inputFiles$aersurface$surface[grepl("aersurface.inp", 
-                                                            unlist(rmetObj$inputFiles$aersurface))]))
-    rmetObj$output$aersurface$surface <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", sep="/"))
-
-    
-    if(!is.null(rmetObj$onsite_Latitude) & !is.null(rmetObj$onsite_Latitude)){
-      system(getOption("aersurface"), 
-             input=readLines(rmetObj$inputFiles$aersurface$onsite[grepl("aersurface_onsite.inp", 
-                                                                 rmetObj$inputFiles$aersurface$onsite)]))
-      rmetObj$output$aersurface$onsite <- readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", 
-                                                           sep="/"))
+  if ("aersurface" %in% processor) {
+    if (newaersurface) {
+      system(paste(
+        getOption("aersurface"),
+        rmetObj$inputFiles$aersurface$surface
+      ))
       
+      if (!is.null(rmetObj$inputFiles$aersurface$onsite)) {
+        system(paste(
+          getOption("aersurface"),
+          rmetObj$inputFiles$aersurface$onsite
+        ))
+        
+      }
       
     }
     
-    
-    
+    else{
+      system(getOption("aersurface"),
+             input = readLines(rmetObj$inputFiles$aersurface$surface[grepl("aersurface.inp",
+                                                                           unlist(rmetObj$inputFiles$aersurface))]))
+      rmetObj$output$aersurface$surface <-
+        readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out", sep =
+                          "/"))
+      
+      
+      if (!is.null(rmetObj$onsite_Latitude) &
+          !is.null(rmetObj$onsite_Latitude)) {
+        system(getOption("aersurface"),
+               input = readLines(rmetObj$inputFiles$aersurface$onsite[grepl("aersurface_onsite.inp",
+                                                                            rmetObj$inputFiles$aersurface$onsite)]))
+        rmetObj$output$aersurface$onsite <-
+          readLines(paste(rmetObj$project_Dir, "aersurface/aersurface.out",
+                          sep = "/"))
+        
+        
+      }
+      
     }
+    
+  }
   
   
   

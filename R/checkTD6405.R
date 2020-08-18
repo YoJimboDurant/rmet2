@@ -22,6 +22,7 @@ checkTD6405 <- function(start_Date, end_Date,  surf_Call){
       ".dat")
   })
   
+  fileName <- unique(fileName)
   checkTD6405 <- sapply(fileName, httr::http_error)
   if(any(checkTD6405)){
     warning(paste("Missing file on NOAA site:\n", fileName[!checkTD6405], "\n"))

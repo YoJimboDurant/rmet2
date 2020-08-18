@@ -78,7 +78,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
   if("aerminute" %in% type){
         print("Writing AERMINUTE input text:\n")
         
-        
+      
         
         aerminInputFiles <- lapply(seq_along(loc_years), function(i){
           aerminInp <- paste(aerminTemplate, collapse="\n")
