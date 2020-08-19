@@ -39,17 +39,25 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
         rmetObj$inputFiles$aersurface$surface
       ))
       
+      rmetObj$output$aersurface$surface <-
+        readLines(paste(rmetObj$project_Dir, "aersurface/nws_sfc_chars.out", sep =
+                          "/"))
+      
+      
       if (!is.null(rmetObj$inputFiles$aersurface$onsite)) {
         system(paste(
           getOption("aersurface"),
           rmetObj$inputFiles$aersurface$onsite
         ))
         
+        rmetObj$output$aersurface$onsite <-
+          readLines(paste(rmetObj$project_Dir, "aersurface/os_sfc_chars.out",
+                          sep = "/"))
+        
+        
       }
       
-    }
-    
-    else{
+    }else{
       system(getOption("aersurface"),
              input = readLines(rmetObj$inputFiles$aersurface$surface[grepl("aersurface.inp",
                                                                            unlist(rmetObj$inputFiles$aersurface))]))
@@ -141,6 +149,25 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     }
     
     if(!is.null(rmetObj$inputFiles$aersurface$onsite)){
+      
+      if(newaersurface){
+        
+        headLines <- grep("^\\*", rmetObj$output$aersurface$onsite, value=TRUE)
+        
+        surfaceFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$surface, value=TRUE)
+        onsiteFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$onsite, value=TRUE)
+        
+        surfaceSect <- grep("^   SECTOR", rmetObj$output$aersurface$surface, value=TRUE)
+        onsiteSect <- grep("^   SECTOR", rmetObj$output$aersurface$onsite, 
+                           value=TRUE)
+        
+        surfaceChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$surface, value=TRUE)
+        onsiteChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$onsite, 
+                           value=TRUE)
+        
+        
+      }else{
+      
       headLines <- grep("^\\*", rmetObj$output$aersurface$surface, value=TRUE)
       
       surfaceFreqSect <- grep("  FREQ_SECT", rmetObj$output$aersurface$surface, value=TRUE)
@@ -158,7 +185,7 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
       
       onsiteChar <- grep("^   SITE_CHAR", rmetObj$output$aersurface$onsite, 
                           value=TRUE)
-      
+      }
       
       inpFile <- c(headLines[1:(length(headLines)-1)],
                    onsiteFreqSect,
