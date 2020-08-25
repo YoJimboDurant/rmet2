@@ -129,8 +129,8 @@ createMetProject <- function(project_Name,
       stopifnot(any(grepl(surf_USAF, surf_Hist$USAF) &
                       grepl(surf_WBAN, surf_Hist$WBAN)))
       
-      TD3505df <- surf_Hist[as.numeric(surf_Hist$USAF) == (surf_USAF) & 
-                                as.numeric(surf_Hist$WBAN) == surf_WBAN,]
+      TD3505df <- dplyr::filter(surf_Hist, stringr::str_trim(USAF) == surf_USAF, 
+                                stringr::str_trim(WBAN) == surf_WBAN)
       #check dates
       if(dim(TD3505df)[[1]] > 1) stop(paste(" Identified more than 1 surface station:\n", paste(TD3505Df, collapse = "\n")))
 
