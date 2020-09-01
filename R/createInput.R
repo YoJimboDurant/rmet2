@@ -7,7 +7,7 @@
 
 
 
-createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aersurface_os",
+createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
                                              "aermet1",
                                              "aermet2", "aermet3"), ustar = TRUE, inputOps = list(S1 =
                                                                                       list(),
@@ -202,6 +202,35 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
   )
   
   
+  #Create String
+  if(any(c(
+    rmetObj$aersurface$surfaceChar$as_Snow == "Y",
+    rmetObj$surfaceChar$as_Moisture =="W",
+    rmetObj$surfaceChar$as_Moisture =="D",
+    rmetObj$surfaceChar$as_Arid =="Y"
+    ))){
+    
+    climate <- "   CLIMATE"
+    
+    climate <- ifelse(is.null(rmetObj$surfaceChar$as_Moisture),  paste(climate, "AVG"),
+           ifelse(rmetObj$surfaceChar$as_Moisture =="D", paste(climate, "DRY"), 
+                  paste(climate, "WET"))
+    )
+    
+    climate <- ifelse(rmetObj$aersurface$surfaceChar$as_Snow =="Y",
+           paste(climate, "SNOW"),
+           paste(climate, "NOSNOW"))
+    
+    climate <- ifelse(rmetObj$aersurface$surfaceChar$as_Arid =="Y",
+           paste(climate, "ARID"),
+           paste(climate, "NONARID"))
+
+     control <- c(control, climate)
+   
+    
+  }
+  
+  
   control <- c(
     control, 
     paste("   FREQ_SECT", "MONTHLY", dim(rmetObj$aersurface$surfaceChar$nws_sector)[[1]], "VARYAP", sep = "  "  ),
@@ -219,20 +248,29 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
   
   control <- c(control, gsub(",", "", apply(freq_dfx, 1, toString)))
   
+  
+  
+  
+
+  
   if(!is.null(rmetObj$aersurface$surfaceSeason$as_Winter_NS)){
     control <- c(control, 
                  paste("   SEASON   WINTERNS  ", rmetObj$aersurface$surfaceSeason$as_Winter_NS)
     )
-  }
+  }else{
   
-    if(!is.null(rmetObj$aersurface$surfaceSeason$as_Winter_WS)){
       control <- c(control, 
                    paste("   SEASON   WINTERWS  ", rmetObj$aersurface$surfaceSeason$as_Winter_WS)
       )
       
       
       
-    }  
+  } 
+  
+
+  
+    
+  
     
   control <- c( control, 
                 paste("   SEASON   SPRING    ", rmetObj$aersurface$surfaceSeason$as_Spring),
@@ -245,19 +283,19 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
     "** OUTPUT",
     "OU STARTING",
     paste0("   SFCCHAR    \"", rmetObj$project_Dir, "/aersurface/nws_sfc_chars.out\""),
-    paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_lc_tif_dbg.txt\""),
+    paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_lc_tif_dbg.tif\""),
     paste0("   NLCDGRID   \"", rmetObj$project_Dir, "./aersurface/nws_landcover.txt\""))
   
   if(!is.null(rmetObj$aersurface$inputFiles$imp_File)){
     ouput <- c(ouput,
     paste0("   MPRVGRID   \"", rmetObj$project_Dir, "/aersurface/nws_imp_tif_dbg.txt\""),
-    paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_impervious.txt\"")
+    paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_impervious.tif\"")
     )
   }
  if(!is.null(rmetObj$aersurface$inputFiles$cnpy_File)){
    ouput <- c(ouput,
    paste0("   CNPYGRID   \"", rmetObj$project_Dir, "/aersurface/nws_can_tif_dbg.txt\""),
-   paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_canopy.txt\"")
+   paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_canopy.tif\"")
    )             
    
   }
@@ -314,6 +352,36 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
                  "** Use default specified km radius",
                  paste("   ZORADIUS ", rmetObj$aersurface$surfaceChar$as_radius)
     )
+  
+    
+    
+    #Create String
+    if(any(c(
+      rmetObj$aersurface$surfaceChar$as_Snow == "Y",
+      rmetObj$surfaceChar$as_Moisture =="W",
+      rmetObj$surfaceChar$as_Moisture =="D",
+      rmetObj$surfaceChar$as_Arid =="Y"
+    ))){
+      
+      climate <- "   CLIMATE"
+      
+      climate <- ifelse(is.null(rmetObj$surfaceChar$as_Moisture),  paste(climate, "AVG"),
+                        ifelse(rmetObj$surfaceChar$as_Moisture =="D", paste(climate, "DRY"), 
+                               paste(climate, "WET"))
+      )
+      
+      climate <- ifelse(rmetObj$aersurface$surfaceChar$as_Snow =="Y",
+                        paste(climate, "SNOW"),
+                        paste(climate, "NOSNOW"))
+      
+      climate <- ifelse(rmetObj$aersurface$surfaceChar$as_Arid =="Y",
+                        paste(climate, "ARID"),
+                        paste(climate, "NONARID"))
+      
+      control <- c(control, climate)
+      
+      
+    }
     
     
     control <- c(
@@ -348,6 +416,15 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
       
     }  
     
+    if(rmetObj$aersurface$surfaceChar$as_Snow == "Y"){
+      
+      control <- c(control, 
+                   "   CLIMATE   SNOW")
+    }else{
+      control <- c(control, 
+                   "   CLIMATE   NOSNOW")
+    }
+    
     control <- c( control, 
                   paste("   SEASON   SPRING    ", rmetObj$aersurface$surfaceSeason$as_Spring),
                   paste("   SEASON   SUMMER    ", rmetObj$aersurface$surfaceSeason$as_Summer),
@@ -359,19 +436,19 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws", "aer
       "** OUTPUT",
       "OU STARTING",
       paste0("   SFCCHAR    \"", rmetObj$project_Dir, "/aersurface/os_sfc_chars.out\""),
-      paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/os_lc_tif_dbg.txt\""),
+      paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/os_lc_tif_dbg.tif\""),
       paste0("   NLCDGRID   \"", rmetObj$project_Dir, "./aersurface/os_landcover.txt\""))
     
     if(!is.null(rmetObj$aersurface$inputFiles$imp_File)){
       ouput <- c(ouput,
                   paste0("   MPRVGRID   \"", rmetObj$project_Dir, "/aersurface/os_imp_tif_dbg.txt\""),
-                  paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/os_impervious.txt\"")
+                  paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/os_impervious.tif\"")
       )
     }
     if(!is.null(rmetObj$aersurface$inputFiles$cnpy_File)){
       ouput <- c(ouput,
                   paste0("   CNPYGRID   \"", rmetObj$project_Dir, "/aersurface/os_can_tif_dbg.txt\""),
-                  paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/os_canopy.txt\"")
+                  paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/os_canopy.tif\"")
       )             
       
     }
