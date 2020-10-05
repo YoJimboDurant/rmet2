@@ -16,7 +16,7 @@ makeFinal.rmet <- function(rmetObj, outfilePrefix="outFile"){
   # read surface file
   sFile <- paste(years, paste0("AM_",loc_years,".SFC"), sep="/")
   sFile1 <- readLines(sFile[1])
-  surface_file_1 <- llply(sFile[2:length(sFile)], function(lx){
+  surface_file_1 <- plyr::llply(sFile[2:length(sFile)], function(lx){
     sfcLines <- readLines(lx)
     sfcLines[2:length(sfcLines)]
   })
@@ -24,18 +24,18 @@ makeFinal.rmet <- function(rmetObj, outfilePrefix="outFile"){
   surfOut <- paste0(outfilePrefix, ".sfc")
   surfOut <- paste(rmetObj$project_Dir, surfOut, sep="/")
   write(sFile1, file=surfOut)
-  l_ply(surface_file_1, function(lx) write(lx, surfOut, append=TRUE))
+  plyr::l_ply(surface_file_1, function(lx) write(lx, surfOut, append=TRUE))
   
   # read profile file
   pFile <- paste(years, paste0("AM_",loc_years,".PFL"), sep="/")
   pFile1 <- readLines(pFile[1])
-  profile_file_1 <- llply(pFile[2:length(pFile)], function(lx){
+  profile_file_1 <- plyr::llply(pFile[2:length(pFile)], function(lx){
     readLines(lx, skip=1)
   })
   
   pflOut <- paste0(outfilePrefix, ".pfl")
   pflOut <- paste(rmetObj$project_Dir, pflOut, sep="/")
   write(pFile1, file=pflOut)
-  l_ply(profile_file_1, function(lx) write(lx, pflOut, append=TRUE))
+  plyr::l_ply(profile_file_1, function(lx) write(lx, pflOut, append=TRUE))
   
 }

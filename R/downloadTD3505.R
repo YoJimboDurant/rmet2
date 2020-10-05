@@ -17,7 +17,7 @@ downloadTD3505 <- function (rmetObj, check=TRUE,...) {
   
   
   
-  loc_years <- locYears(rmetObj)
+  loc_years <- rmet2:::locYears(rmetObj)
   locExist <- lapply(seq_along(loc_years), function(i){
     locFiles <- gsub ("https://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}/",
            "S", rmetObj$td3505_noaa[[i]])
@@ -63,6 +63,7 @@ downloadTD3505 <- function (rmetObj, check=TRUE,...) {
         fileOut2 <-fileOut2[indX]
         fileOut <- c(fileOut, fileOut2)
         
+        fileOut <- unique(fileOut)
         indexDate <- ifelse(UTC_startDate > UTC_startYear, UTC_startDate, UTC_startYear)
         indX <-  as.numeric(substring(fileOut, 16,27)) >= indexDate
         fileOut <- fileOut[indX]

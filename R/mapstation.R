@@ -57,18 +57,18 @@ mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
   # Plot stations in Leaflet
   if(engine=="leaflet" & labels == "text"){
     map <- leaflet::leaflet(sdf) %>%
-      addTiles() %>%
-      addMarkers(label=~label,
-                          labelOptions = labelOptions(
+      leaflet::addTiles() %>%
+      leaflet::addMarkers(label=~label,
+                          labelOptions = leaflet::labelOptions(
                             noHide = 'T')) %>%
-      addCircleMarkers(coord["x"],coord["y"],fillColor = "red",color="red")
+      leaflet::addCircleMarkers(coord["x"],coord["y"],fillColor = "red",color="red")
   }
   
   if(engine=="leaflet" & labels == "popup"){
     map <- leaflet::leaflet(sdf) %>%
-      addTiles() %>%
-      addMarkers(label=~label, labelOptions = labelOptions(clickable = TRUE)) %>%
-      addCircleMarkers(coord["x"],coord["y"],fillColor = "red",color="red")
+      leaflet::addTiles() %>%
+      leaflet::addMarkers(label=~label, labelOptions = leaflet::labelOptions(clickable = TRUE)) %>%
+      leaflet::addCircleMarkers(coord["x"],coord["y"],fillColor = "red",color="red")
   }
   
   
