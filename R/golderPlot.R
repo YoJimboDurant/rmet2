@@ -6,7 +6,8 @@
 #' @export 
 
 golderPlot = function(surface_file_1){
-
+requireNamespace(plyr)
+requireNamespace(dplyr)  
   surface_file_1 <- surface_file_1[!is.na(surface_file_1$surface_roughness) & !is.na(surface_file_1$monin_obukhov_length),]
   with(surface_file_1, 
              plot(1/monin_obukhov_length, log10(surface_roughness), ylim=rev(range(log10(surface_roughness))), pch="."))
