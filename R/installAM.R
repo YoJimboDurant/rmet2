@@ -20,7 +20,7 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
   if(!grepl("/$", rootDir)) rootDir <- paste0(rootDir, "/")
 
   #aerminutedownload
-  aerminuteLink <- "https://www3.epa.gov/ttn/scram/7thconf/aermod/aerminute_15272.zip"
+  aerminuteLink <- "https://gaftp.epa.gov/Air/aqmg/SCRAM/models/met/aerminute/aerminute_15272.zip"
   aerminuteVersion <- stringr::str_extract(aerminuteLink, "[0-9]{5}")
   programTree <- list(
     aermetEx = paste0(rootDir,"aermet_exe"),
@@ -32,21 +32,21 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
     
   if(!aermetExists[1]){
     print("downloading aermet")
-    download("http://www3.epa.gov/ttn/scram/7thconf/aermod/aermet_exe.zip", "aermet_exe.zip", mode = "wb")
+    download("https://gaftp.epa.gov/Air/aqmg/SCRAM/models/met/aermet/aermet_exe.zip", "aermet_exe.zip", mode = "wb")
     unzip("aermet_exe.zip", exdir=programTree$aermetEx)
   }
   
   
   if(!aermetExists[2]){
     print("downloading aerminute")
-    download(aerminuteLink, str_extract(aerminuteLink, "aerminute.*[.]zip"), mode = "wb")
-    unzip(str_extract(aerminuteLink, "aerminute.*[.]zip"), exdir=programTree$aerminEx)
+    download(aerminuteLink, str_extract(aerminuteLink, "aerminute_.*[.]zip"), mode = "wb")
+    unzip(str_extract(aerminuteLink, "aerminute_.*[.]zip"), exdir=programTree$aerminEx)
   }
   
   
   if(!aermetExists[3]){
     print("downloading aersurface")
-    download("https://www3.epa.gov/ttn/scram/models/aermod/aersurface/aersurface_exe-64.zip", "aersurface_exe.zip", mode = "wb")
+    download("https://gaftp.epa.gov/Air/aqmg/SCRAM/models/related/aersurface/aersurface_exe-64.zip", "aersurface_exe.zip", mode = "wb")
     unzip("aersurface_exe.zip", exdir=programTree$aerSurfaceEx)
   }
   

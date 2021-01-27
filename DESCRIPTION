@@ -7,6 +7,7 @@ Author: James Durant
 Maintainer: James Durant to <jamesdrenda@charter.net>
 dependencies: true
 LazyData: true
+Encoding: UTF-8
 Depends:
     R (>= 3.2.0),
 Imports:
@@ -30,7 +31,8 @@ Imports:
     readr,
     ggmap,
     httr,
-    tmaptools
+    tmaptools,
+    magrittr
 Description: This packages uses R to automate the downloading of NOAA data and
     running US EPA's AERMET system.
 License: MIT

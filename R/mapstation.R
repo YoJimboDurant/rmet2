@@ -13,7 +13,7 @@
 #' of 25 kilometers is used.
 #' @param engine a character string to specify the mapping application to be used:
 #' \code{"leaflet"} or \code{"kml"}.
-
+#' @importFrom magrittr %>%
 #' @export
 mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
   if("surfhist" %in% ls (envir = rmetData)){
