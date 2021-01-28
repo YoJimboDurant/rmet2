@@ -15,8 +15,7 @@
 #' \item{\code{YearNumSum} Summary of available hours for model,}
 #' \item{\code{monthlyData} Availability by month for all years.}
 #' }
-#' @param startYear a numeric starting year in YYYY first year you want aerminute run
-#' @param stopYear a numeric starting year in YYYY last year you want aerminute run
+#' @param rmetObj a rmet class object
 #' @export
 
 qaAerminute = function(rmetObj){
