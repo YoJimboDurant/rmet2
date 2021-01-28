@@ -18,7 +18,8 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
     print(rmetObj$td6405_noaa)
     
     locExist <- lapply(seq_along(loc_years), function(i){
-      locFiles <- gsub ("https://www1.ncdc.noaa.gov/pub/data/asos-onemin/6405-",
+      locFiles <- gsub (
+        paste0(getOption("rmet.noaa.site"), "asos-onemin/6405-"),
                         "", rmetObj$td6405_noaa[[i]])
       locFiles <- paste0(rmetObj$project_Dir, "/",
                          locFiles)
