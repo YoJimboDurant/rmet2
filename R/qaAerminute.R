@@ -150,8 +150,8 @@ qaAerminute = function(rmetObj){
     dfx <- read.table(textConnection(lz[LN:LE-1]), skip=3)
     
     #label
-    label1 <- unlist(str_split(str_trim(lz[(LN-1)]), pattern="  *"))
-    label2 <- unlist(str_split(str_trim(gsub("YEAR|MONTH", "", lz[(LN)])), pattern="  *"))
+    label1 <- unlist(stringr::str_split(stringr::str_trim(lz[(LN-1)]), pattern="  *"))
+    label2 <- unlist(stringr::str_split(stringr::str_trim(gsub("YEAR|MONTH", "", lz[(LN)])), pattern="  *"))
     label <-c("YEAR", "MONTH", paste(label1, label2))
     
     names(dfx) <- label
