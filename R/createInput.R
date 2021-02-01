@@ -283,19 +283,19 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
     "** OUTPUT",
     "OU STARTING",
     paste0("   SFCCHAR    \"", rmetObj$project_Dir, "/aersurface/nws_sfc_chars.out\""),
-    paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_lc_tif_dbg.tif\""),
+    paste0("   NLCDTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_lc_tif.txt\""),
     paste0("   NLCDGRID   \"", rmetObj$project_Dir, "./aersurface/nws_landcover.txt\""))
   
   if(!is.null(rmetObj$aersurface$inputFiles$imp_File)){
     ouput <- c(ouput,
     paste0("   MPRVGRID   \"", rmetObj$project_Dir, "/aersurface/nws_imp_tif_dbg.txt\""),
-    paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_impervious.tif\"")
+    paste0("   MPRVTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_impervious.txt\"")
     )
   }
  if(!is.null(rmetObj$aersurface$inputFiles$cnpy_File)){
    ouput <- c(ouput,
    paste0("   CNPYGRID   \"", rmetObj$project_Dir, "/aersurface/nws_can_tif_dbg.txt\""),
-   paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_canopy.tif\"")
+   paste0("   CNPYTIFF   \"", rmetObj$project_Dir, "/aersurface/nws_canopy.txt\"")
    )             
    
   }

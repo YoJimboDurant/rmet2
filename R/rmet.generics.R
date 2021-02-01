@@ -154,7 +154,7 @@ convertLong <- function(long){
   
 
 # import isd
-readisd <- function(con="http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt") {
+readisd <- function(con=getOption("rmet.noaa.surfhist")) {
   surfhist <- readLines(con)
   surfhist <- surfhist[23:length(surfhist)]
   surfhist <- sapply(surfhist,substring,
