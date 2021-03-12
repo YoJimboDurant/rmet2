@@ -52,7 +52,7 @@ downloadFSL <- function(rmetObj, ...){
                           "&osort=Station+Series+Sort&oformat=FSL+format+%28ASCII+text%29")
           
           qForm <- httr::GET(xlink)
-          xdata <- httr::content(qForm, encoding="UTF-8")
+          xdata <- httr::content(qForm, encoding="UTF-8", as = "text")
           xdata <- gsub("\\n$", "", xdata)
           writeLines(xdata, localFiles[i])
         }
