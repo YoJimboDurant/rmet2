@@ -17,7 +17,12 @@ checkTD3505 <- function(start_Date, end_Date, surf_USAF, surf_WBAN){
         ".gz")
     })
 
-    checkTD3505 <- sapply(fileName, httr::http_error)
+    checkTD3505 <- NULL
+    for(i in 1:length(fileName))function(x){
+      
+      checkTD3505[x] <- httr::http_error(x)
+    }
+      
     if(any(checkTD3505)){
       stop(paste("Missing file on NOAA site:\n", fileName[!checkTD3505]))
     }
