@@ -31,6 +31,7 @@ surfCheck <- function(rmetObj, outfile="surfaceFile.pdf", file.choose=FALSE,
     is.na(surface_file_1$surface_roughness) <- surface_file_1$surface_roughness == -9
     #is.na(surface_file_1$ws)<- surface_file_1$ws == 0.0
     #is.na(surface_file_1$wd) <- surface_file_1$wd == 0
+    is.na(surface_file_1$albedo) <- surface_file_1$albedo == 9
     
     total_hours <- length(surface_file_1$hour)
     
@@ -135,7 +136,7 @@ boxplot(surface_file_1$monin_obukhov_length~surface_file_1$hour, ylab="Monin-Obu
 # 
 # with(surface_file_1, 
 #      plot(1/monin_obukhov_length, log10(surface_roughness), ylim=rev(range(log10(surface_roughness))), pch="."))
-golderPlot(surface_file_1)
+# golderPlot(surface_file_1)
 }
 surface_plot_fct(surface_file_1$temperature, surface_file_1$date, factor=1, ylab="Temperature (K)", title="Temperature")
 boxplot(surface_file_1$temperature~surface_file_1$month, ylab="Temperature (K)", xlab="Month", main="Temperature by Month")

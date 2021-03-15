@@ -6,8 +6,8 @@
 #' @export 
 
 golderPlot = function(surface_file_1){
-requireNamespace(plyr)
-requireNamespace(dplyr)  
+requireNamespace("plyr")
+requireNamespace("dplyr")  
   surface_file_1 <- surface_file_1[!is.na(surface_file_1$surface_roughness) & !is.na(surface_file_1$monin_obukhov_length),]
   with(surface_file_1, 
              plot(1/monin_obukhov_length, log10(surface_roughness), ylim=rev(range(log10(surface_roughness))), pch="."))
@@ -36,11 +36,11 @@ requireNamespace(dplyr)
     text(median(dfx$inv_L), median(ys), dfx$PG[1])
   }
 
-  line_lx <- plyr::dlply(PS_class_df, .(PG), function(dfx) calc_invL(dfx$a,dfx$b, dfx$y1, dfx$y2))
+  line_lx <- plyr::dlply(PS_class_df, plyr:::.(PG), function(dfx) calc_invL(dfx$a,dfx$b, dfx$y1, dfx$y2))
   
   line_df <- plyr::ldply(line_lx, function(lx) data.frame(inv_L=lx))
   
   
-  plyr::d_ply(line_df, .(PG), function(dfx) plot_pgL(dfx))
+  plyr::d_ply(line_df, plyr:::.(PG), function(dfx) plot_pgL(dfx))
   return(NULL)
 }
