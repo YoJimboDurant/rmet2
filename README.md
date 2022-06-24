@@ -1,23 +1,36 @@
 README
 ================
 
-Background
-----------
+## Background
 
-This package is designed to assist running US EPA's Meteorological Processors, [AERMINUTE](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm), [AERSURFACE](https://www3.epa.gov/ttn/scram/dispersion_related.htm#aersurface), and [AERMET](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm). Rmet2 provides the following features:
+This package is designed to assist running US EPA’s Meteorological
+Processors,
+[AERMINUTE](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm),
+[AERSURFACE](https://www3.epa.gov/ttn/scram/dispersion_related.htm#aersurface),
+and [AERMET](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm).
+Rmet2 provides the following features:
 
--   Automatic Downloading of Meteorological Data from National Oceonographic and Atmospheric Administration (NOAA) websites.
+-   Automatic Downloading of Meteorological Data from National
+    Oceonographic and Atmospheric Administration (NOAA) websites.
 
--   Scripted set up of runstream input files to assist in reproducibility.
+-   Scripted set up of runstream input files to assist in
+    reproducibility.
 
--   Caputuring output runstreams and files and producing tables and figures useful for air dispersion modelers to perform quality assurance checks on intermediate and final outputs of the meteorological preprocessors.
+-   Caputuring output runstreams and files and producing tables and
+    figures useful for air dispersion modelers to perform quality
+    assurance checks on intermediate and final outputs of the
+    meteorological preprocessors.
 
 The package is designed to work with [R](www.r-project.org).
 
-Installation
-------------
+## Installation
 
-In R, the following script will check for, and if needed, install the package [devtools](https://cran.r-project.org/web/packages/devtools/index.html), and then attempt to install rmet2 to your system. You will only have to install rmet2 once on your system, so for normal day-to-day use you will not need to run the installation script:
+In R, the following script will check for, and if needed, install the
+package
+[devtools](https://cran.r-project.org/web/packages/devtools/index.html),
+and then attempt to install rmet2 to your system. You will only have to
+install rmet2 once on your system, so for normal day-to-day use you will
+not need to run the installation script:
 
 ``` r
 if(!"devtools" %in% installed.packages()) install.pacakges(devtools)
@@ -55,10 +68,10 @@ library(rmet2)
     ## [1] "rmet"
     ## 
     ## $rmet.noaa.site
-    ## [1] "http://www1.ncdc.noaa.gov/pub/data/"
+    ## [1] "https://www1.ncdc.noaa.gov/pub/data/"
     ## 
     ## $rmet.noaa.surfhist
-    ## [1] "http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt"
+    ## [1] "https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt"
 
 ``` r
 installAM()
@@ -83,7 +96,9 @@ sapply(c("aermet", "aerminute", "aersurface"), getOption)
     ##                               aersurface 
     ##       "C:/aersurface_exe/aersurface.exe"
 
-Examples usage:
----------------
+## Examples usage:
 
-[Pittsburg International Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/kpit.md)
+[Pittsburg International
+Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/kpit.md)
+[Atlanta International
+Airport](https://github.com/YoJimboDurant/rmet2/blob/dev/examples/atlanta.md)
