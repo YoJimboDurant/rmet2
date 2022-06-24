@@ -102,4 +102,4 @@ sapply(c("aermet", "aerminute", "aersurface"), getOption)
 Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/kpit.md)
 
 [Atlanta International
-Airport](https://github.com/YoJimboDurant/rmet2/blob/dev/examples/atlanta.md)
+Airport](http://htmlpreview.github.io/?https://github.com/YoJimboDurant/rmet2/blob/dev/examples/atlanta.md)
