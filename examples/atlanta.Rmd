@@ -1,0 +1,781 @@
+---
+title: "Atlanta Example of RMET2"
+output: github_document
+always_allow_html: yes
+---
+
+# Using R to process Air Dispersion Meteorology Data (AERMET)
+
+```{r, echo = FALSE, fig.cap = "Meteorological File Preparation for AERMOD", cache = TRUE}
+DiagrammeR::grViz("digraph {
+  graph [layout = dot, rankdir = TB]
+
+  node [shape = rectangle]
+  AERMINUTE [label = 'AERMINUTE', style=dashed, color=grey]
+  AERMET1 [label = 'AERMET STAGE 1']
+  AERMET2 [label =  'AERMET STAGE 2']
+  AERMET3 [label = 'AERMET STAGE 3']
+  AERSURFACE [label = 'AERSURFACE', style=dashed, color=grey]
+  PROFILE [label = 'Profile File', shape = folder]
+  SURFACE [label = 'Surface File', shape = folder]
+  
+  # edge definitions with the node IDs
+  AERMINUTE -> AERMET2[style=dashed, color=grey]
+  AERMET1 -> AERMET2 
+  AERMET2 -> AERMET3
+  AERSURFACE -> AERMET3[style=dashed, color=grey]
+  AERMET3 -> SURFACE
+  AERMET3 -> PROFILE
+  }",
+  height = 500)
+
+
+```
+**Notes:**
+
+1. AERMINUTE - (optional) extract and quality assure (QA) minute level data from National Weather Service Automated Surface Observation Station (NWS ASOS) and calculate hourly wind speed and direction.
+2. AERMET stage 1
+  + (optional) Take output from AERMINUTE and QA. 
+  + Extract and QA hourly surface data from a variety of formats.
+  + Extract and QA upper air data.
+  + (optional) extract and QA on site data (requires user specified FORTRAN format codes)
+3. AERMET stage 2 -  Uses output from AERMET stage 1, prepare intermediate files for AERMET stage 3.
+4. AERSURFACE (optional) uses National Land Cover Dataset data and determine Albedo, Surface Roughness, and Bowen Ratio.
+5. AERMET stage 3 - Uses output from AERMET stage 2, and AERSURFACE (or user specified surface characteristics) and calculate dispersion parameters (surface file) and wind speed and wind direction by height (profile file).
+
+```{block, type = "key"}
+The meteorological processors are text based and their output is text based. motivation for `rmet2` was to use R to perform: 
+
+* downloading of meteorological and land use files, 
+* setting up the input files, and 
+* visual and tabular summaries of the intermediate and file outputs.
+
+```
+
+
+## rmet 2
+
+### rmet2 object
+The basic structure of `rmet2` is the `rmet` class object. It is a list object containing the needed information and options to download the land use and meteorology files and set up the meteorology process files. Many `rmet2` function expect and will modify and return `rmet2` class objects. 
+
+The class of the object will change the behavior of the functions. In the case or `rmet2` the functions will verify that the correct information is present in the object before the operation is performed. 
+
+During creation of the `rmet2` object, `rmet2` verifies that the needed meteorological files exist and will return an error if files are missing on the National Climatic Data Center site.   
+
+```{block, type = "warning"}
+When `rmet2` objects are created, the object is saved in the working directory for the project as a binary data file. If a new object is created, the old object will not be replaced, and instead the old one will be reloaded. This persistence encourages users to keep and preserve records of AERMET files created and not overwrite them unless explicitly removed by the program or the user. 
+```
+
+
+### Installing rmet2
+
+Installation from github using devtools will check and ensure that the package is always up to date:
+
+```{r, cache = TRUE, eval = FALSE}
+if(!"devtools" %in% installed.packages()) install.pacakges(devtools)
+devtools::install_git("https://github.com/YoJimboDurant/rmet2", ref = "dev")
+```
+
+```{block, type = "warning"}
+There are 2 problems with getting data from NOAA:
+
+1. Lately, access to the noaa website https://www1.ncdc.noaa.gov/pub/data/noaa/ has been intermittent. 
+2. You can access the the ftp site, but CDC's firewall universally blocks access to ftp sites (even government sites). 
+
+You can get an exception, but it takes a lot of information and approvals, and ITSO has to successfully configure your computer to have a static IP address, and then the firewall people need to put in the exception successfully. 
+
+All in all it is frankly easier to login to the guest wifi at campus and download via that site. To set rmet2 to work with the ftp sites, you need to change 2 options prior to loading `rmet2`:  
+```
+
+```{r, eval = TRUE}
+options(rmet.noaa.site = "ftp://ftp.ncdc.noaa.gov/pub/data/",
+    rmet.noaa.surfhist = "ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.txt"
+)
+```
+
+
+In this example we will proceed with using the www1 noaa site.
+
+```{r}
+library(rmet2)
+```
+
+
+Besides information about the author/creator of the package, `rmet2` will print information that will be useful for debugging:
+
+* options that are set (aermet, aerminute, aersurface) which is the location of the executables for the processors (These can be modified direction using the `options` function or can be modified by some functions within rmet2 (e.g. `installAM`)),
+* the location of the ncdc database online, and
+* the location of the history file used to determine the availability of surface data. This loaded dynamically every time the library is called.
+
+
+## Example Site - Atlanta Hartsfield Jackson Airport, GA
+
+```{r, cache = TRUE}
+
+mapstation("33.831581 -84.468445")
+```
+
+For this example, we will select Atlanta Hartsfield Jackson Airport. 
+
+### NWS Station Details
+
+I recommend gathering station information from mesonet. The page for Atlanta is https://mesonet.agron.iastate.edu/sites/site.php?network=GA_ASOS&station=ATL:
+
+* WBAN 13874 (Weather Bureau Army - Navy)
+* USAF 722190 (US Air Force)
+* Call: KATL
+* Latitude: 33.63010
+* Longitude: -84.44180
+* Elevation: 315
+
+We need to check and verify if minute level data are available at NCDC:
+
+https://www1.ncdc.noaa.gov/pub/data/asos-onemin/6405-2020/
+https://www1.ncdc.noaa.gov/pub/data/asos-fivemin/6401-2020/
+
+Finally we need to find ice free wind speed sensor date:
+https://www.weather.gov/media/asos/ASOS%20Implementation/IFW_stat.pdf. The significance of this is the threshold of sensitivity for the sensor. Before the installation of the ice free sensor AERMINUTE output data are censored below a threshold and after installation the wind speed is not censored at all.
+
+* ice free winds: 3/27/2007
+
+### Upper Air Stations
+
+[Radiosonde](https://www.weather.gov/upperair/factsheet) data is needed to for AERMET to understand the vertical stability of the atmosphere. So a regional radiosonde data needs to be downloaded from https://ruc.noaa.gov/raobs/. `rmet2` can facilitate this process, but you need to identify which station you need to download data from.
+
+Select state, then sort by station, and identify the station you want to use. In this case, it is Peachtree City, Georgia.
+
+* WMO 72215
+* Latitude 33.35
+* Longitude -84.56
+
+You only need WMO and latitude and longitude for `rmet2`. The WBAN number is not present in some upper air stations. 
+
+
+### Where do you want to store all the files?
+
+For the project, I recommend establishing a system of directories to store your projects on. In this example I will store the directory as `rootDir` and is specific for my project:
+
+```{r, cache = TRUE}
+rootDir = "C:/rmet2/GA/ATLANTA_INT_AP"
+```
+
+### Snowcover Information
+
+Although not an issue in Georgia, in other states, there is this strange whitish state of water that covers the land for extended periods of time. 
+
+This is called snow. 
+
+Since snow cover effects Bowen ratio, Albedo and surface roughness and needs to be accounted for in AERSURFACE. You can use `rnoaa` (https://github.com/ropensci/rnoaa)  to get 30-year climate normals to gather snow cover information. Note you will need to install rnoaa and obtain an API key (see https://docs.ropensci.org/rnoaa/articles/rnoaa.html). You will also need the FIPS code for the county you are in:
+
+```{r, message = FALSE, warning = FALSE}
+library(rnoaa)
+library(FedData)
+library(tidyverse)
+library(magrittr)
+library(sf)
+
+# you can run with FIPS:17097 for more interesting example
+
+x <- ncdc_stations(datatypeid='mly-snwd-avgnds-ge001wi', locationid = 'FIPS:17097')
+print(x$data[c("name","id","mindate","maxdate")])
+```
+
+We need to recode data to get the data into a data.frame:
+```{r}
+snowcover <- lapply(x$data$id, function(x){
+  ncdc(datasetid = "NORMAL_MLY", datatypeid = "mly-snwd-avgnds-ge001wi", 
+       stationid = x,
+       startdate = "2010-01-01", 
+       enddate="2010-12-31", limit=365)
+}
+)
+
+
+snowcover_lx <- lapply(snowcover, function(x) {
+  x$data$value[x$data$value == -7777] <- 0
+  x$data$value[x$data$value == -9999] <- NA
+  x$data$value <- x$data$value/10
+  return(x)
+})
+
+snowcover_dfx <- Reduce(function(...) ncdc_combine(...), snowcover_lx)$data
+```
+
+To make a plot (by station):
+```{r}
+ggplot(snowcover_dfx, aes(x=date, y=value, shape=station, group=station)) + 
+  geom_point(size=4) + geom_line() + xlab("Date") + ylab("Days with > 1 inch Snow Cover") +
+  theme_light() + theme(axis.text.x = element_text(angle = 90))
+```
+
+
+
+To make a table:
+```{r}
+snowcover_dfx %>% group_by(station) %>%
+  dplyr::summarise(total_snow = sum(value))
+
+snowcover_dfx %<>% mutate(rate = value/30.4) # rate of snowcover
+
+snowrate_dfx <- snowcover_dfx %>% dplyr::group_by(date) %>% dplyr::summarise(snowMean = round(mean(rate), 2)) %>%
+  mutate(snowMean = ifelse(snowMean <0.01, 0, snowMean), month = 1:12)
+
+snowrate_dfx
+```
+
+Unsurprisingly we do not normally have appreciable snowcover in Clayton County, where the airport is located. 
+
+
+### Download Land Use Files
+
+In addition to the meteorological variables (wind speed, direction, temperature, and solar radiation), we are going to need to know something about the land around the station collecting these measurements. Specifically, you are going to need:
+
+1. [Albedo](https://climate.ncsu.edu/edu/Albedo) - proportion of solar energy reflected at noon. 
+
+2. [Bowen Ratio](https://en.wikipedia.org/wiki/Bowen_ratio) - ratio of latent to sensible heat flux [latent and sensible heat](https://climate.ncsu.edu/edu/Heat).
+
+3.[Surface roughness length](https://en.wikipedia.org/wiki/Roughness_length) - parameter that specifies the height that the wind speed will be theoretically zero. 
+
+Albedo and Bowen ratio deal with heat energy and it's effects of turbulence. The surface roughness is used to calculate the profile of wind speeds.
+
+To get the land use data, we can use the package `FedData`. You can also manually download these files as well from the [Multi-Resolution Landuse Consortium](https://www.mrlc.gov/national-land-cover-database-nlcd-2016). 
+
+```{block, type = "key"}
+For data downloaded using `FedData` you will need to project from Mercator into Alber's Equal Area projection for AERSURFACE to use these files. Therefore, get a slightly larger area. For instance, if you want a 5 kilometer radius study area, then select 5.5 kilometers.
+
+```
+
+```{r, message = FALSE, warning = FALSE, results = 'hide'}
+sfc_station_point <-
+  data.frame(long = -84.44180, lat =  33.63010) %>%
+  st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+sfc_station <- sfc_station_point %>%
+  st_transform(crs = 26916) %>%
+  st_buffer(dist = 5500) %>%
+  st_bbox() %>%
+  st_as_sfc()
+
+# need to transform back to AEA projection
+lc_2016 <-
+  get_nlcd(
+    as(sfc_station, "Spatial"),
+    label = "land_cover",
+    extraction.dir = paste(rootDir, "preprocessed_data", sep = "/"),
+    force.redo = T,
+    year = 2016
+  )
+tc_2016 <-
+  get_nlcd(
+    as(sfc_station, "Spatial"),
+    dataset = "canopy",
+    label = "canopy",
+    extraction.dir = paste(rootDir, "preprocessed_data", sep = "/"),
+    force.redo = T,
+    year = 2016
+  )
+imp_2016 <-
+  get_nlcd(
+    as(sfc_station, "Spatial"),
+    dataset = "impervious",
+    label = "Imperv",
+    extraction.dir = paste(rootDir, "preprocessed_data", sep = "/"),
+    force.redo = T,
+    year = 2016
+  )
+
+
+lc_2016aea <- raster::projectRaster(
+  lc_2016,
+  crs = " +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+  method = "ngb",
+  res = c(30, 30),
+  options = c("COMPRESS=NONE", "TFW=YES"),
+  filename = gsub("[.]tif", "_rmet.tif", raster::filename(lc_2016)),
+  overwrite = T
+)
+
+tc_2016aea <-
+  raster::projectRaster(
+    tc_2016,
+    crs = " +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    method = "ngb",
+    res = c(30, 30),
+    options = c("COMPRESS=NONE", "TFW=YES"),
+    filename = gsub("[.]tif", "_rmet.tif", raster::filename(tc_2016)),
+    overwrite = T
+  )
+imp_2016aea <-
+  raster::projectRaster(
+    imp_2016,
+    crs = " +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    method = "ngb",
+    res = c(30, 30),
+    options = c("COMPRESS=NONE", "TFW=YES"),
+    filename = gsub("[.]tif", "_rmet.tif", raster::filename(imp_2016)),
+    overwrite = T
+  )
+```
+
+You should check the input files using leaflet, or you can export to another GIS system. Note: in this notebook I am not evaluating these lines because of markdown issues:
+
+```{r, eval = FALSE}
+library(leaflet)
+library(leaflet.opacity)
+
+legend_dict = c(
+  '11 Open Water',
+  '12 Perennial Ice/Snow',
+  '21 Developed, Open Space',
+  '22 Developed, Low Intensity',
+  '23 Developed, Medium Intensity',
+  '24 Developed High Intensity',
+  '31 Barren Land (Rock/Sand/Clay)',
+  '41 Deciduous Forest',
+  '42 Evergreen Forest',
+  '43 Mixed Forest',
+  '51 Dwarf Scrub',
+  '52 Shrub/Scrub',
+  '71 Grassland/Herbaceous',
+  '72 Sedge/Herbaceous',
+  '73 Lichens',
+  '74 Moss',
+  '81 Pasture/Hay',
+  '82 Cultivated Crops',
+  '90 Woody Wetlands',
+  '95 Emergent Herbaceous Wetlands'
+)
+
+
+# colortable for values:
+colors_nlcd2016 <-
+  colorFactor(
+    c(
+      "#466B9F",
+      "#D1DEF8",
+      "#DEC5C5",
+      "#D99282",
+      "#EB0000",
+      "#AB0000",
+      "#B3AC9F",
+      "#68AB5F",
+      "#1C5F2C",
+      "#B5C58F",
+      "#af963c",
+      "#CCB879",
+      "#DFDFC2",
+      "#d1d182",
+      "#a3cc51",
+      "#82ba9e",
+      "#DCD939",
+      "#AB6C28",
+      "#B8D9EB",
+      "#6C9FB8"
+    ),
+    domain = c(
+      11,
+      12,
+      21,
+      22,
+      23,
+      24,
+      31,
+      41,
+      42,
+      43,
+      51,
+      52,
+      71,
+      72,
+      73,
+      74,
+      81,
+      82,
+      90,
+      95
+    )
+  )
+
+legend_colors_nlcd2016 <-
+  colorFactor(
+    c(
+      "#466B9F",
+      "#D1DEF8",
+      "#DEC5C5",
+      "#D99282",
+      "#EB0000",
+      "#AB0000",
+      "#B3AC9F",
+      "#68AB5F",
+      "#1C5F2C",
+      "#B5C58F",
+      "#af963c",
+      "#CCB879",
+      "#DFDFC2",
+      "#d1d182",
+      "#a3cc51",
+      "#82ba9e",
+      "#DCD939",
+      "#AB6C28",
+      "#B8D9EB",
+      "#6C9FB8"
+    ),
+    domain = legend_dict
+  )
+
+
+
+leaflet() %>% addProviderTiles("Esri.WorldImagery") %>%
+  addRasterImage(
+    raster::ratify(lc_2016aea),
+    opacity = 0.5,
+    colors = colors_nlcd2016,
+    layer = "raster"
+  ) %>%
+  addOpacitySlider(layerId = "raster") %>%
+  addPolygons(
+    data = st_transform(sfc_station, crs = 4326),
+    fill = NA,
+    weight = 1.5
+  ) %>%
+  addMarkers(data = sfc_station_point, label = "KATL") %>%
+  addLegend(
+    "bottomright",
+    pal = legend_colors_nlcd2016,
+    legend_dict,
+    title = "Land Use",
+    opacity = 1
+  )
+
+```
+
+### Installing processors
+
+You can either manually download and unzip the meteorological processors and use the `options` function to set the aerminute, aersurface and aermet location. Alternatively, you can use the `installAM` function. It is also a great idea to keep these processors as part of your project as they are updated every few years - and you can run into problems with reproducibility. You can use the `exists = rep(TRUE, 3)` to avoid overwriting a current install of the metoerological processors.
+
+```{r, results = 'hide'}
+installAM(rootDir = rootDir)
+```
+
+
+
+### Creating an rmet2 object
+
+As a first step, you need to identify and gather the appropriate information for the analysis. Depending on the needs of the project, the first step is generally the selection of the National Weather Service station. `rmet2` provides a function that will pull a map that will help in this process as shown above. 
+
+
+To create the Atlanta Airport Project:
+
+
+```{r}
+KATL <- createMetProject(
+  project_Name = "GA_Atlanta_International_AP",
+  project_Dir=rootDir,
+  start_Date = lubridate::mdy_hm("06/06/2019 00:00", tz="Etc/GMT+5"),
+  end_Date = lubridate::mdy_hm("12/31/2020 23:00", tz="Etc/GMT+5"),
+  surf_UTC = -5,
+  surf_WBAN = 13874,
+  surf_USAF = 722190,
+  surf_Call="KATL",
+  surf_Latitude = 33.63010,
+  surf_Longitude = -84.44180,
+  surf_Elevation = 315,
+  surf_AnenometerHeight = 10,
+  ua_WMO = 72215,
+  ua_UTC=-5,
+  ua_Latitude =  33.35,
+  ua_Longitude = -84.56,
+  ifg = "Y 03 27 2007",
+  lc_File = raster::filename(lc_2016aea),
+  lc_Type = "NLCD2016",
+  imp_File = raster::filename(imp_2016aea),
+  imp_Type = "MPRV2016",
+  cnpy_File = raster::filename(tc_2016aea),
+  cnpy_Type = "CNPY2016",
+  as_Snow = "N",
+  as_Arid = "N",
+  as_Moisture = "A",
+  as_Airport = "Y",
+  as_Winter_NS ="12 1 2",
+  as_Winter_WS = NULL,
+  as_Spring ="3 4 5",
+  as_Summer = "6 7 8",
+  as_Autumn = "9 10 11",
+  onsite_Latitude = NULL,
+  onsite_Longitude = NULL,
+  onsite_Fstring = NULL
+)
+```
+
+### AERMINUTE
+
+Generally, I start my workflow with AERMINUTE. AERMINUTE extracts 2 minute rolling averages of wind speed and wind direction from monthly files (either reported every minute or every five minutes). The reason this is done is that hourly data from NOAA since 1996 is censored for wind speeds below 3 knots.
+
+
+```{r, echo = FALSE}
+DiagrammeR::grViz("digraph {
+  graph [layout = dot, rankdir = TB]
+
+  node [shape = folder]
+  DSI6405 [label = 'DSI 6405\nASOS 1-minute']
+  DSI6401 [label = 'DSI 6401\nASOS 5-minute']
+  DS3505 [label =  'DS 3505\nISHD Hourly Surface', style=dashed, color=grey]
+  AERMINUTE [label = 'AERMINUTE', shape = rectangle]
+  HOURFILE [label = 'HOURFILE\nHourly averaged winds']
+  SUMMFILE [label = 'SUMMFILE\nHourly summary of minutes used and\nminimum, maximum, and average winds']
+  COMPFILE [label = 'COMPFILE\nCompares the standard observations \nagainst the 1-minute observations', style=dashed, color=grey]
+
+  # edge definitions with the node IDs
+  DSI6401 -> AERMINUTE 
+  DSI6405 -> AERMINUTE
+  DS3505 -> AERMINUTE[style=dashed, color=grey]
+  AERMINUTE -> HOURFILE
+  AERMINUTE -> SUMMFILE
+  AERMINUTE -> COMPFILE[style=dashed, color=grey]
+  }",
+  height = 500)
+
+
+```
+
+Other QA files can be produced from AERMINUTE, but these are typically what I use. 
+
+#### Downloading AERMINUTE Files
+
+To download the files:
+
+```{r, results = "hide"}
+downloadTD6405(KATL, check=TRUE)
+downloadTD6401(KATL, check=TRUE)
+downloadTD3505(KATL, check=TRUE)
+```
+
+The check argument verifies if the files are already downloaded before downloading.
+
+So far we have only used rmet2 to download the files for AERMINUTE, to create the input files, you need to:
+
+```{r}
+KATL <- createInput(KATL, type = "aerminute")
+```
+
+This adds the text that will be used to write the input files for AERMINUTE. This is appended to the KATL `rmet2` object. To View:
+
+```{r}
+cat(KATL$inputText$aerminute[[2]])
+```
+
+It also specifies the output files in the `rmet2` object:
+```{r}
+KATL$outputFiles$aerminute
+```
+
+Now we have created the input text, we need to write the input file for AERMINUTE, and create link to where these files are:
+
+```{r}
+KATL <- writeInputFile(KATL, type = "aerminute")
+KATL$inputFiles$aerminute
+```
+
+The purpose in doing multiple steps is to allow the user to specify existant input files that they may have received or created previously for a processor. 
+
+
+And to run AERMINUTE:
+
+```{r}
+KATL <- processMet(KATL, processor="aerminute")
+```
+AERMINUTE creates a lot of textual output, which is dumped into AERMET.log files in each of the year files in the project directory. 
+
+It can be a little difficult to collect the key information, and detect trends in changes in data issues with the AERMINUTE output, therefore, we have added `qaAerminute` function.
+
+```{r}
+qaAerminute(KATL) %>% pander::pander(.)
+```
+
+
+You can also read and analyze the Summary and Comparison Files for further analysis. 
+
+
+```{r}
+aerminute.sum <- lapply(2019:2020,  function(x){
+  read_csv(paste0(rootDir, "/", x, "/", "AM_1MIN_",x, "_summ.DAT"))
+}) %>%
+  bind_rows() %>%
+  mutate(Date = lubridate::ymd_h(paste(Date,as.numeric(hr) - 1), tz = lubridate::tz(KATL$start_Date)))
+
+aerminute.comp <- lapply(2019:2020,  function(x){
+  read_csv(paste0(rootDir, "/", x, "/", "AM_1MIN_",x, "_comp.DAT"), guess_max = 5000)
+}) %>%
+  bind_rows() %>%
+  mutate(date = lubridate::ymd_h(paste(`date(yyyymmdd)`,as.numeric(hour) - 1), tz = lubridate::tz(KATL$start_Date)))
+
+aerminute.sum %>%
+  ggplot(aes(x=Date, y = `total minutes`)) + geom_point() + theme_light()
+
+
+```
+You can also look at average wind speed:
+
+```{r}
+aerminute.sum %>%
+  mutate(`avg speed` = ifelse(`avg speed` == 999, NA, `avg speed`)) %>%
+  ggplot(aes(x=Date, y = `avg speed`)) + geom_point(alpha = 0.1, size = 0.6) + geom_smooth() + theme_light()
+```
+
+And average wind direction:
+
+```{r}
+aerminute.sum %>%
+  mutate(`avg dir` = ifelse(`avg dir` == 999, NA, `avg dir`)) %>%
+  ggplot(aes(x=Date, y = `avg dir`)) + geom_point(alpha = 0.5, size = 0.5)  + theme_light()
+
+```
+
+Interpretations of these graphics can be a little tricky. In general, you are looking in sudden changes in the wind speed and wind direction (see https://www.atsdr.cdc.gov/HAC/pha/TranscontinentalPipeline/TranscontinentalPipelineHC04182011.pdf Figure D4 for example of 2 problematic wind direction plots).
+
+### AERSURFACE
+
+The 3 step process of creating input and writing the input file is similar with AERSURFACE:
+
+```{r}
+
+KATL <- createInput(KATL, type = "aersurface_nws")
+cat(KATL$inputText$aersurface[[1]])
+
+```
+```{r}
+KATL <- writeInputFile(KATL, type = "aersurface")
+KATL <- processMet(KATL, processor =  "aersurface")
+
+```
+```{r}
+KATL$output$aersurface[[1]]
+```
+### AERMET
+
+#### Data Files
+We have already downloaded the surface file data. Now we need to get the upper air data (radiosonde). `rmet2` automates this process.
+
+```{r}
+downloadFSL(KATL)
+```
+
+#### Stage 1
+
+Stage 1 reads in data and performs basic extraction and QA of the data:
+
+```{r}
+KATL <- createInput(KATL, type = "aermet1")
+cat(KATL$inputText$aermet$s1[[1]])
+```
+
+
+
+You can modify this text or create an input file of your own and read it into R and add it to the inputText portion of the rmet object.
+
+```{r}
+KATL <- processMet(KATL, processor  = "aermet1")
+```
+
+
+
+### Stage 2
+
+```{r}
+KATL <- createInput(KATL, type = "aermet2")
+cat(KATL$inputText$aermet$s2[[1]])
+```
+
+
+```{r}
+KATL <- processMet(KATL, processor  = "aermet2")
+```
+
+### Stage 3
+
+```{r}
+KATL <- createInput(KATL, type = "aermet3")
+cat(KATL$inputText$aermet$s3[[1]])
+```
+
+
+```{r}
+KATL <- processMet(KATL, processor  = "aermet3")
+```
+
+```{r}
+
+makeFinal.rmet(KATL, "KATL")
+```
+
+## Checking output
+
+You should check the message files from each of these processors for warnings and errors. A future enhancement to `rmet2` will help with this process, but for now you need to use a text processor for this. 
+
+### Reading in surface file
+
+You can read in the surface file with `surfaceReader`:
+
+```{r}
+katl_sfc <- surfaceReader(sfile = "C:/rmet2/GA/ATLANTA_INT_AP/KATL.sfc", rmetObj = KATL)
+```
+
+
+### Checking Monin-Obukhov Length
+
+THIS IS A VERY ABSTRACT CONCEPT. But a simple way of thinking about the Monin-Obukhav length is the height at which the the turbulence is more generated by heat than wind sheer.
+
+You should expect negative values during daylight and positive values during the night. I typically use a boxplot to check this:
+
+```{r}
+katl_sfc %>% 
+  ggplot(aes(x = factor(hour),  y = monin_obukhov_length)) + 
+  geom_boxplot() + theme_light()
+```
+
+
+By checking against hour of the day, you can verify that you have not mispecified your time adjustment for your surface station.
+
+### Wind Direction
+
+You should check your wind direction plot. You are looking for sharp changes in the wind direction, indicative of changes to the met station or tower position. You should also look for issues of "stuck" wind vanes as well.
+
+```{r}
+katl_sfc %>%
+  ggplot(aes(x = date, y = wd)) + 
+  geom_point(alpha = 0.5, size = 0.5) + 
+  theme_light()
+```
+
+
+### Wind Speed
+
+Similar to wind direction, you are looking for sharp changes in the wind speed data.
+
+```{r}
+katl_sfc %>%
+  ggplot(aes(x = date, y = ws)) + 
+  geom_point(alpha = 0.5, size = 0.5) +
+  geom_smooth() +
+  theme_light()
+```
+
+
+You can also look at the wind rose:
+
+```{r}
+openair::windRose(katl_sfc)
+```
+
+
+### Surface roughness
+
+AERMOD is very sensitive to errors in surface roughness, so it is a good idea to look and see if your surface roughness makes sense by direction. I use a pollution rose from open air to do this.
+
+```{r}
+openair::polarFreq(katl_sfc, pol = "surface_roughness", breaks = c(0.037, 0.048, 0.053, 0.060,0.71), type = "season")
+```
+
+This shows overall low roughness (you can compare typical values in the AERMET user guide). There are higher roughness to the south, which makes sense given our position at an airport and examining the aerial photographs. 
+
+If you have an onsite station, there is a column in the surface file that will indicate which station the wind data is coming from. 
