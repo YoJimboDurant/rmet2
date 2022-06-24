@@ -1,6 +1,6 @@
 ---
 title: "Atlanta Example of RMET2"
-output: github_document
+output: html_document
 always_allow_html: yes
 ---
 
