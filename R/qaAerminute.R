@@ -21,7 +21,7 @@
 qaAerminute = function(rmetObj){
   # library(plyr)
   # library(stringr)
-  stopifnot(is.rmet(KATL))
+  stopifnot(is.rmet(rmetObj))
   
   #read years from input
   years <- locYears(rmetObj)
