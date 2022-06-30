@@ -98,6 +98,11 @@ sapply(c("aermet", "aerminute", "aersurface"), getOption)
 
 ## Examples usage:
 
+[Lake Charles
+LA](https://github.com/YoJimboDurant/rmet2/blob/dev/examples/klch_lake_charles_la.R)
+
+Old Examples (no longer working with new version of AERMET):
+
 [Pittsburg International
 Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/kpit.md)
 
