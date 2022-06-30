@@ -4,18 +4,29 @@
 \alias{mesoData}
 \title{mesoData}
 \usage{
-mesoData(station = NULL, rmetObj = NULL, API_KEY, type = c("surf"))
+mesoData(station = NULL, rmetObj = NULL, API_KEY = NULL, type = c("surf"))
 }
 \arguments{
 \item{station}{a 4 letter ICAO character string.
-For example, "KATL" for Altanta.}
+For example, "KATL" for Hartsfield- Jackson International Airport in Altanta, GA. 
+If an rmetObj is passed to the function, then the ICAO is extracted from the rmetObj.}
 
 \item{rmetObj}{is an rmet class list created by createMetProject (optional).}
 }
 \description{
-This function will query the mesowest API and extract location and elevation (in meters) 
-of surface station using the  International Civil Aviation Organization (ICAO) 
-code. If a rmet class object is passed as well, it will append the information to the rmet list and return it.
+This function will query the Mesonet API (https://developers.synopticdata.com/mesonet/) 
+and extract location and elevation (in meters) of surface station using the  
+International Civil Aviation Organization (ICAO) code. If a rmet class object 
+is passed as well, it will append the information to the rmet list and return it.
 
 \code{mesoData}
+}
+\examples{
+
+\dontrun{
+  # You will need to obtain a valid token - example is test token
+  mesoData("KATL", API_KEY =  "4bb67eab0b964e1d9e1a990349bb8251")
+  }
+
+
 }

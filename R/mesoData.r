@@ -2,20 +2,32 @@
 #' 
 #' @description
 #' 
-#' This function will query the mesowest API and extract location and elevation (in meters) 
-#' of surface station using the  International Civil Aviation Organization (ICAO) 
-#' code. If a rmet class object is passed as well, it will append the information to the rmet list and return it.
+#' This function will query the Mesonet API (https://developers.synopticdata.com/mesonet/) 
+#' and extract location and elevation (in meters) of surface station using the  
+#' International Civil Aviation Organization (ICAO) code. If a rmet class object 
+#' is passed as well, it will append the information to the rmet list and return it.
 #' 
 #' \code{mesoData} 
 #' 
 #' @param station a 4 letter ICAO character string.
-#' For example, "KATL" for Altanta.
-#' @param rmetObj is an rmet class list created by createMetProject (optional). 
-
+#' For example, "KATL" for Hartsfield- Jackson International Airport in Altanta, GA. 
+#' If an rmetObj is passed to the function, then the ICAO is extracted from the rmetObj.
+#' 
+#' @param rmetObj is an rmet class list created by createMetProject (optional).
+#' @API_KEY is the token for the https://developers.synopticdata.com/mesonet/ site. 
+#'
+#' @examples
+#' 
+#' \dontrun{
+#'   # You will need to obtain a valid token - example is test token
+#'   mesoData("KATL", API_KEY =  "4bb67eab0b964e1d9e1a990349bb8251")
+#'   }
+#'
+#'
 #' @export
 
 
-mesoData<- function(station = NULL, rmetObj = NULL, API_KEY, type=c("surf")){
+mesoData<- function(station = NULL, rmetObj = NULL, API_KEY = NULL, type=c("surf")){
   stopifnot(type %in% c("surf"))
   stopifnot(is(rmetObj) == "rmet" | is.null(rmetObj))
  if(!is.null(rmetObj)) stopifnot(is(rmetObj == "rmet"))

@@ -7,7 +7,7 @@
 downloadTD3505(rmetObj, check = TRUE, ...)
 }
 \description{
-\code{downloadTD3505} Boo!
+\code{downloadTD3505} 
 
 The function is designed to perform basic checks to make sure that 
 the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})

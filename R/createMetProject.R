@@ -1,4 +1,4 @@
-#' @title createMetProject
+T#' @title createMetProject
 #' 
 #' @description
 #' \code{createMetProject} Creates basic aermet project, specifying 
@@ -12,6 +12,8 @@
 #' rmet class object as an .rds file in the \code{project_Dir}
 #' 
 #' This can be re-read into the R session with \code{readRDS}.
+#' 
+#' See examples for usage.
 #' 
 #' @export
 

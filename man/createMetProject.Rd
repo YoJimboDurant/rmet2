@@ -61,4 +61,6 @@ The function also uses the \code{make.names} function to save the
 rmet class object as an .rds file in the \code{project_Dir}
 
 This can be re-read into the R session with \code{readRDS}.
+
+See examples for usage.
 }
