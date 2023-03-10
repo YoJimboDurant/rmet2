@@ -1,7 +1,7 @@
 Package: rmet2
 Type: Package
 Title: Download files and run AERMET
-Version: 0.13
+Version: 0.14
 Date: 2017-02-28
 Author: James Durant
 Maintainer: James Durant to <jamesdrenda@charter.net>
@@ -36,4 +36,4 @@ Imports:
 Description: This packages uses R to automate the downloading of NOAA data and
     running US EPA's AERMET system.
 License: MIT
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
