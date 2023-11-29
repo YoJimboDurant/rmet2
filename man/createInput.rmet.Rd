@@ -6,7 +6,7 @@
 \usage{
 \method{createInput}{rmet}(
   rmetObj,
-  type = c("aerminute", "aersurface_nws", "aermet1", "aermet2", "aermet3"),
+  type = c("aerminute", "aersurface_nws", "aermet1", "aermet2", "aermet3", "aermet23"),
   ustar = TRUE,
   inputOps = list(S1 = list(), S2 = list(), S3 = list(other = list("THRESH_1MIN 0.5"),
     method = list("REFLEVEL SUBNWS", "STABLEBL ADJ_U*")))

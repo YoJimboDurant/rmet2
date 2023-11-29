@@ -28,7 +28,7 @@ station_mesowest <- tibble(surf_Latitude = 42.27056,
 
 
 # the rootDir is where you want the files and output to go (I changed to C).
-rootDir = "C:/HAPs/AERMET/Program/MA_case"
+rootDir = "C:/rmet2/MA/KORH"
 
 
 # Download and Check Surface Land Classification Files --------------------
@@ -365,7 +365,7 @@ KORH <- processMet(KORH, processor = c("aermet1"))
 # in the documentation. Here is where regular expressions have saved my life.
 
 
-KORH <- createInput(KORH, type = c("aermet2", "aermet3"))
+KORH <- createInput(KORH, type = c("aermet23"))
 
 # use purr and gsub to combine the text files:
 

@@ -9,7 +9,8 @@
 
 createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
                                              "aermet1",
-                                             "aermet2", "aermet3"), ustar = TRUE, inputOps = list(S1 =
+                                             "aermet2", "aermet3",
+                                             "aermet23"), ustar = TRUE, inputOps = list(S1 =
                                                                                       list(),
                                                                                     S2 = list(),
                                                                                     S3 = list(other = list(
@@ -23,7 +24,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
  # type <- match.arg(type)
   stopifnot(class(rmetObj) =="rmet")
   stopifnot(all(type %in% c("aerminute", "aersurface", "aersurface_nws", "aersurface_os",
-                            "aermet1", "aermet2", "aermet3")))
+                            "aermet1", "aermet2", "aermet3", "aermet23")))
   missAerminute <- all(c(sapply(rmetObj$td6401_noaa, function(x) length(x)==0),
                        sapply(rmetObj$td6405_noaa, function(x) length(x)==0)))
   if(!is.null(ustar)){
@@ -675,6 +676,100 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
     
   }
 
+  
+  
+  if("aermet23" %in% type){
+    S2 <- lapply(seq_along(loc_years), function(i) {
+      
+      
+      
+      list(
+        JOB=list(
+          "JOB",
+          "**",
+          paste0("  REPORT     ", prepareThePath(paste(destDir[[i]], "S2.RPT", sep="/"))),
+          paste0("  MESSAGES   ", prepareThePath(paste(destDir[[i]], "S2.MSG", sep="/")))),
+        UPPERAIR=list(
+          "UPPERAIR",
+          "**",
+          paste0("  QAOUT      ", prepareThePath(paste(destDir[[i]],"UAQAOUT.DAT",sep="/")))
+        ),
+        SURFACE = list(
+          "SURFACE",
+          "**",
+          paste0("  QAOUT        ", prepareThePath(ishqaoutFiles[[i]])),
+          if(!missAerminute){
+            paste0("  ASOS1MIN        ", prepareThePath(paste0(destDir[[i]], "/AM_", "1MIN_", 
+                                                               loc_years[[i]], ".DAT")))
+          }else{"** MISSING AERMINUTE FILES"}
+          
+        ),
+        MERGE = list(
+          "MERGE",
+          "**",
+          paste0("  OUTPUT        ", prepareThePath(paste0(destDir[[i]], "/AMS2_ISHD.MRG"))),
+          paste0("  XDATES        ", xdates2[[i]])
+          
+        )
+      )
+    })
+    
+    S2 <- lapply(S2, function(lx){
+      paste(lapply(lx, function(x) paste(x, collapse="\n")), collapse="\n")
+    })
+    
+    rmetObj$inputText$aermet$s2 <- S2
+    
+ 
+    S3 <- lapply(seq_along(loc_years), function(i) {
+      
+      
+      
+      list(
+        JOB=list(
+          "JOB",
+          "**",
+          paste0("  REPORT     ", prepareThePath(paste(destDir[[i]], "S3.RPT", sep="/"))),
+          paste0("  MESSAGES   ", prepareThePath(paste(destDir[[i]], "S3.MSG", sep="/")))),
+        METPREP=list(
+          "METPREP",
+          "**",
+          paste0("  XDATES        ", xdates2[[i]]),
+          paste0("  DATA          ", prepareThePath(paste(destDir[[i]], "AMS2_ISHD.MRG", sep="/"))),
+          paste0(paste0("  ", inputOps$S3$other), collapse = "\n"),
+          paste0(paste0("  METHOD        ", inputOps$S3$method),collapse = "\n"),
+          paste0("  NWS_HGT    ", "WIND ", rmetObj$surf_AnenometerHeight),
+          paste0("  OUTPUT        ", prepareThePath(paste(destDir[[i]], paste0("AM_",loc_years[[i]],".SFC"),
+                                                          sep="/"))),
+          paste0("  PROFILE        ", prepareThePath(paste(destDir[[i]], paste0("AM_",loc_years[[i]],".PFL"),
+                                                           sep="/")))
+        )
+      )
+      
+      
+    })
+    
+    S3 <- lapply(S3, function(lx){
+      paste(lapply(lx, function(x) paste(x, collapse="\n")), collapse="\n")
+    })
+    
+    rmetObj$inputText$aermet$s3 <- S3
+    
+    
+    rmetObj$inputText$aermet$s2 <-
+      purrr::imap(
+        rmetObj$inputText$aermet$s2,
+        ~ paste0(.x, gsub("JOB.+[.]MSG\"", "", 
+                          gsub("DATA.+MRG\\n", "",      rmetObj$inputText$aermet$s3[[.y]])),
+                 "\n", paste(rmetObj$output$aersurface$surface, collapse = "\n")
+        )
+      )
+    
+    rmetObj$inputText$aermet$s3 <- NULL
+    
+    
+  }
+  
   
 return(rmetObj)
 

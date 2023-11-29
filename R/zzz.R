@@ -2,6 +2,8 @@
   op <- options()
   op.rmet <- list(
     rmet.noaa.site = "https://www1.ncdc.noaa.gov/pub/data/",
+    rmet.noaa.1min = "https://www.ncei.noaa.gov/data/automated-surface-observing-system-one-minute-pg1/access/",
+    rmet.noaa.5min = "https://www.ncei.noaa.gov/data/automated-surface-observing-system-five-minute/access/",
     rmet.noaa.surfhist = "https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt",
     rmet.install.args = "",
     rmet.name = "rmet",

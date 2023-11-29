@@ -14,7 +14,7 @@
 #' If an rmetObj is passed to the function, then the ICAO is extracted from the rmetObj.
 #' 
 #' @param rmetObj is an rmet class list created by createMetProject (optional).
-#' @API_KEY is the token for the https://developers.synopticdata.com/mesonet/ site. 
+#' @param API_KEY is the token for the https://developers.synopticdata.com/mesonet/ site. 
 #'
 #' @examples
 #' 
