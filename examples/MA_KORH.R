@@ -30,7 +30,7 @@ station_mesowest <- tibble(surf_Latitude = 42.27056,
 # the rootDir is where you want the files and output to go (I changed to C).
 rootDir = "C:/rmet2/MA/KORH"
 
-
+installAM(rootDir = rootDir)
 # Download and Check Surface Land Classification Files --------------------
 
 
@@ -46,12 +46,12 @@ sfc_station_point <-
 
 # plotKML will plot on google earth if you have it installed.
 
-plotKML::plotKML(sfc_station_point)
+# plotKML::plotKML(sfc_station_point)
 
 
 
 sfc_station <- sfc_station_point %>%
-  st_buffer(dist = 5500)
+  st_buffer(dist = 5500, max_cells = 10000)
 
 
 # Download land use data using buffer - landcover
@@ -93,34 +93,35 @@ imp_2016 <-
 
 # Add some projection information
 lc_2016aea <- project(
-  rast(lc_2016),
+  lc_2016,
   y = " +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
-  method = "near",
   res = c(30, 30),
+  method = "near",
   wopt = list(gdal = c("COMPRESS=NONE", "TFW=YES")),
-  filename = gsub("[.]tif", "_rmet2.tif", raster::filename(lc_2016)),
+  filename = gsub("[.]tif", "_rmet2.tif", sources(lc_2016)),
   overwrite = T,
   datatype = "INT1U"
 )
 
 tc_2016aea <-
   project(
-    rast(tc_2016),
+    tc_2016,
     y = " +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
-    method = "near",
     res = c(30, 30),
+    method = "near",
     wopt = list(gdal = c("COMPRESS=NONE", "TFW=YES")),
-    filename = gsub("[.]tif", "_rmet2.tif", raster::filename(tc_2016)),
+    filename = gsub("[.]tif", "_rmet2.tif", sources(tc_2016)),
     overwrite = T
   )
+
 imp_2016aea <-
   project(
-    rast(imp_2016),
+    imp_2016,
     y = " +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
     method = "near",
     res = c(30, 30),
     wopt = list(gdal = c("COMPRESS=NONE", "TFW=YES")),
-    filename = gsub("[.]tif", "_rmet2.tif", raster::filename(imp_2016)),
+    filename = gsub("[.]tif", "_rmet2.tif", sources(imp_2016)),
     overwrite = T
   )
 
@@ -129,7 +130,7 @@ imp_2016aea <-
 # check landcover file
 
 library(leaflet)
-library(leaflet.opacity)
+
 
 legend_dict = c(
   '11 Open Water',
@@ -232,28 +233,44 @@ legend_colors_nlcd2016 <-
   )
 
 
+pal <- colorNumeric("Spectral", domain = c(0, 1000), na.color = NA)
+pal1 <- colorNumeric("Oranges", domain = c(0, 1000), na.color = NA)
 
 leaflet() %>% addProviderTiles("Esri.WorldImagery") %>%
+  
   addRasterImage(
-    raster::ratify(lc_2016),
-    opacity = 0.5,
+    group = "landcover",
+    lc_2016aea,
     colors = colors_nlcd2016,
     layer = "raster"
   ) %>%
-  addOpacitySlider(layerId = "raster") %>%
+  addRasterImage(
+    group = "treecover",
+    tc_2016aea,
+    colors = pal1,
+    layer = "raster2"
+  ) %>%
+  addRasterImage(
+    group = "impcover",
+    imp_2016aea,
+    layer = "raster1",
+    colors = pal,
+  ) %>%
   addPolygons(
     data = st_transform(sfc_station, crs = 4326),
     fill = NA,
-    weight = 1.5
+    weight = 1.5,
+    group = "buffer"
   ) %>%
-  addCircleMarkers(data = sfc_station_point, label = "KORH") %>%
+  addCircleMarkers(data = sfc_station_point, label = "KORH", group = "KORH") %>%
   addLegend(
     "bottomright",
     pal = legend_colors_nlcd2016,
     legend_dict,
     title = "Land Use",
     opacity = 1
-  )
+  ) %>%
+  addLayersControl(overlayGroups = c("impcover","treecover", "landcover",  "KORH", "buffer"))
 
 
 # install processors
@@ -369,14 +386,6 @@ KORH <- createInput(KORH, type = c("aermet23"))
 
 # use purr and gsub to combine the text files:
 
-KORH$inputText$aermet$s2 <-
-  purrr::imap(
-    KORH$inputText$aermet$s2,
-    ~ paste0(.x, gsub("JOB.+[.]MSG\"", "", 
-                      gsub("DATA.+MRG\\n", "",      KORH$inputText$aermet$s3[[.y]])),
-             "\n", paste(KORH$output$aersurface$surface, collapse = "\n")
-    )
-  )
 
 
 cat(KORH$inputText$aermet$s2[[1]]) # and viola!

@@ -10,16 +10,15 @@ Processors,
 and [AERMET](https://www3.epa.gov/scram001/metobsdata_procaccprogs.htm).
 Rmet2 provides the following features:
 
--   Automatic Downloading of Meteorological Data from National
-    Oceonographic and Atmospheric Administration (NOAA) websites.
+- Automatic Downloading of Meteorological Data from National
+  Oceonographic and Atmospheric Administration (NOAA) websites.
 
--   Scripted set up of runstream input files to assist in
-    reproducibility.
+- Scripted set up of runstream input files to assist in reproducibility.
 
--   Caputuring output runstreams and files and producing tables and
-    figures useful for air dispersion modelers to perform quality
-    assurance checks on intermediate and final outputs of the
-    meteorological preprocessors.
+- Caputuring output runstreams and files and producing tables and
+  figures useful for air dispersion modelers to perform quality
+  assurance checks on intermediate and final outputs of the
+  meteorological preprocessors.
 
 The package is designed to work with [R](www.r-project.org).
 
@@ -67,6 +66,12 @@ library(rmet2)
     ## $rmet.name
     ## [1] "rmet"
     ## 
+    ## $rmet.noaa.1min
+    ## [1] "https://www.ncei.noaa.gov/data/automated-surface-observing-system-one-minute-pg1/access/"
+    ## 
+    ## $rmet.noaa.5min
+    ## [1] "https://www.ncei.noaa.gov/data/automated-surface-observing-system-five-minute/access/"
+    ## 
     ## $rmet.noaa.site
     ## [1] "https://www1.ncdc.noaa.gov/pub/data/"
     ## 
@@ -98,13 +103,12 @@ sapply(c("aermet", "aerminute", "aersurface"), getOption)
 
 ## Examples usage:
 
-[Lake Charles
-LA](https://github.com/YoJimboDurant/rmet2/blob/dev/examples/klch_lake_charles_la.R)
+These are updated to work with the new version of aermet using the
+`createInput(KORH, type = c("aermet23"))`. It will create the combined
+stage 2 input file.
 
-Old Examples (no longer working with new version of AERMET):
+Additionally, the script has been updated to remove dependencies on
+packages that are no longer on CRAN (mainly due to rgdal issues).
 
-[Pittsburg International
-Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/kpit.md)
-
-[Atlanta International
-Airport](http://htmlpreview.github.io/?https://github.com/YoJimboDurant/rmet2/blob/dev/examples/atlanta.html)
+[Worcester Regional
+Airport](https://github.com/YoJimboDurant/rmet2/blob/dev/examples/MA_KORH.R)
