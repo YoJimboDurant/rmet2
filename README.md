@@ -111,4 +111,4 @@ Additionally, the script has been updated to remove dependencies on
 packages that are no longer on CRAN (mainly due to rgdal issues).
 
 [Worcester Regional
-Airport](https://github.com/YoJimboDurant/rmet2/blob/dev/examples/MA_KORH.R)
+Airport](https://github.com/YoJimboDurant/rmet2/blob/master/examples/MA_KORH.R)
