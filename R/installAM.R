@@ -45,7 +45,7 @@ installAM <- function(rootDir="C:/", aermetExists=rep(FALSE,3)){
   
   if(!aermetExists[3]){
     print("downloading aersurface")
-    downloader::download("https://gaftp.epa.gov/Air/aqmg/SCRAM/models/related/aersurface/aersurface_exe-64.zip", "aersurface_exe.zip", mode = "wb")
+    downloader::download("https://gaftp.epa.gov/Air/aqmg/SCRAM/models/related/aersurface/aersurface_exe.zip", "aersurface_exe.zip", mode = "wb")
     unzip("aersurface_exe.zip", exdir=programTree$aerSurfaceEx)
   }
   

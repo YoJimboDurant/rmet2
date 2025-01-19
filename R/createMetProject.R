@@ -30,8 +30,11 @@ createMetProject <- function(project_Name,
                              surf_AnenometerHeight,
                              surf_UTC,
                              ifg,
-                             ua_WMO,
+                             ua_WMO = NULL,
                              ua_WBAN=NULL,
+                             ua_IGRA_zip,
+                             ua_IGRA_ext = NULL,
+                             ua_elevation,
                              ua_UTC,
                              ua_Latitude,
                              ua_Longitude,
@@ -72,6 +75,8 @@ createMetProject <- function(project_Name,
   # check if rmet project exists if so load it
   
   if(!is.null(as_nsector)) warning("as_nsector is being depreciated and will not be used unless AERSURFACE < 13016")
+  if(any(!is.null(c(ua_WMO, ua_WBAN)))) warning("FSL upper air data no longer available for download. The WBAN and FSL
+                                                arguments are retained for backward compatability.")
   
   rmetFile <- paste(project_Dir, paste0(
     make.names(project_Name),
@@ -173,6 +178,9 @@ createMetProject <- function(project_Name,
                           td6401_noaa = td6401_noaa,
                           ua_WMO = ua_WMO,
                           ua_WBAN = ua_WBAN,
+                          ua_IGRA_zip = ua_IGRA_zip,
+                          ua_IGRA_ext = ua_IGRA_ext,
+                          ua_elevation = ua_elevation,
                           ua_UTC = ua_UTC,
                           ua_Latitude = ua_Latitude,
                           ua_Longitude = ua_Longitude,

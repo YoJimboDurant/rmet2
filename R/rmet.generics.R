@@ -38,9 +38,14 @@ is.rmet <- function(rmetObj, full.test=FALSE){
 ##' @method print rmet
 print.rmet <- function(rmetObj){
   stopifnot(is.rmet(rmetObj, full.test=TRUE))
+  if(!is.null(rmetObj$ua_WMO)){
   print(data.frame(rmetObj[c("project_Name", "project_Dir", "start_Date", "end_Date", "surf_WBAN", 
                              "surf_USAF", "surf_Call", "surf_UTC", "ua_WMO", "ua_UTC", "ifg")]))
-  
+  }else{
+    print(data.frame(rmetObj[c("project_Name", "project_Dir", "start_Date", "end_Date", "surf_WBAN", 
+                               "surf_USAF", "surf_Call", "surf_UTC", "ua_IGRA_zip", "ua_UTC", "ua_elevation","ifg")]))
+    
+  }
 }
 
 
