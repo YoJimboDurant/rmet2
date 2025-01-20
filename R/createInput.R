@@ -43,8 +43,14 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
   loc_years <- locYears(rmetObj)
   
   xtz <- lubridate::tz(rmetObj$start_Date)
-  
+  if(!is.null(rmetObj$ua_WMO)){
   fslFiles <- paste(path.expand(rmetObj$project_Dir), "/", loc_years,"/", rmetObj$ua_WMO,".FSL", sep="")
+  } 
+  
+  if(is.null(rmetObj$ua_WMO)){
+    fslFiles <- KORH$ua_IGRA_ext 
+  }
+    
   uaexoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAEXOUT.DAT", sep="/")
   uaqaoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAQAOUT.DAT", sep="/")
   stationID <- paste0(rmetObj$surf_USAF, rmetObj$surf_WBAN)
@@ -545,8 +551,9 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
   }
   
   if("aermet1" %in% type){
-   
- 
+   if(!is.null(rmetObj$ua_IGRA_zip)){
+    wmoID <- str_extract(rmetObj$ua_IGRA_zip, "\\d{8}")
+   }
     S1 <- lapply(seq_along(loc_years), function(i) {list(
       JOB=list(
         "JOB",
@@ -555,14 +562,35 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
         paste0("  MESSAGES   ", prepareThePath(paste(destDir[[i]], "S1.MSG", sep="/")))),
       UPPERAIR=list(
         "UPPERAIR",
-        paste("**          Upper air data for WMO:",
-              rmetObj$ua_WMO ,"FSL format"),
-        paste0("  DATA      ", prepareThePath(fslFiles[[i]]), " FSL"),
+        if(!is.null(rmetObj$ua_WMO)){
+          paste("**          Upper air data for WMO:",
+              rmetObj$ua_WMO ,"FSL format")} else{
+        if(is.null(rmetObj$ua_WMO)){
+          paste("**          Upper air data for IGRA:",
+                wmoID ,"IGRA format")
+        
+        }
+                },
+        if(!is.null(rmetObj$ua_WMO)){
+          paste0("  DATA      ", prepareThePath(fslFiles[[i]]), " FSL")
+          }else{
+            if(is.null(rmetObj$ua_WMO)){
+              paste0("  DATA      ", prepareThePath(fslFiles[[i]]), " IGRA")
+              
+            }
+          },
         paste0("  EXTRACT   ", prepareThePath(uaexoutFiles[[i]])),
         "  AUDIT     UATT UAWS UALR",
         paste0("  XDATES    ", xdates[[i]]),
+        if(!is.null(rmetObj$ua_WMO)){
         paste0("  LOCATION  ", rmetObj$ua_WMO,"  ",convertLat(rmetObj$ua_Latitude),"   ",
-               convertLong(rmetObj$ua_Longitude),"   ",-(rmetObj$ua_UTC)),
+               convertLong(rmetObj$ua_Longitude),"   ",-(rmetObj$ua_UTC))
+          }else{
+            if(is.null(rmetObj$ua_WMO)){
+              paste0("  LOCATION  ", wmoID, "  ",convertLat(rmetObj$ua_Latitude),"   ",
+                     convertLong(rmetObj$ua_Longitude),"   ",-(rmetObj$ua_UTC), "   ",rmetObj$ua_elevation)
+            } 
+          },
         paste0("  QAOUT     ", prepareThePath(uaqaoutFiles[[i]])),
         "  MODIFY"),
       SURFACE = list(

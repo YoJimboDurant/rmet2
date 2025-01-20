@@ -5,7 +5,9 @@
 #' 
 #' The function takes Integrated Global Radiosode Archieve (igra) zip file and extracts the zipfile and
 #' trims the file to match the start date and end date of the 
-#' study period.  
+#' study period. It adds the local file locations to the rmetObj and returns it.
+#' @param rmetObj is valid rmetObject created by createMetProject
+#' @param igraLoc is the https location of the igra files. By default location is https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/access/data-por/ 
 #' @export
 #' 
 downloadIGRA <- function(rmetObj, igraLoc = "https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/access/data-por/"){
@@ -79,7 +81,7 @@ downloadIGRA <- function(rmetObj, igraLoc = "https://www.ncei.noaa.gov/data/inte
 
   ua_years <- rmet2:::locYears(rmetObj)
 
-  lapply(ua_years, function(x){
+  exFiles <- lapply(ua_years, function(x){
     exFile <- paste(
       rmetObj$project_Dir, "/", x, "/",
       paste("igra", x, sep = "_"),
@@ -93,6 +95,12 @@ downloadIGRA <- function(rmetObj, igraLoc = "https://www.ncei.noaa.gov/data/inte
     ua_year_data <- ua_data[minLine:maxLine]
     
     writeLines(ua_year_data, exFile)
+    return (exFile)
+    
   })
-      
+  
+  rmetObj$ua_IGRA_ext <- exFiles
+  file.remove(tempFile)
+  
+  return(rmetObj)
   }
