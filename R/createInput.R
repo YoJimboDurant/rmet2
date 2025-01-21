@@ -48,7 +48,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
   } 
   
   if(is.null(rmetObj$ua_WMO)){
-    fslFiles <- KORH$ua_IGRA_ext 
+    fslFiles <- rmetObj$ua_IGRA_ext 
   }
     
   uaexoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAEXOUT.DAT", sep="/")

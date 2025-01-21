@@ -20,5 +20,5 @@ downloadIGRA(
 
 The function takes Integrated Global Radiosode Archieve (igra) zip file and extracts the zipfile and
 trims the file to match the start date and end date of the 
-study period.
+study period. It adds the local file locations to the rmetObj and returns it.
 }

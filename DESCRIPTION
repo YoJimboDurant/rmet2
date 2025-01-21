@@ -1,8 +1,8 @@
 Package: rmet2
 Type: Package
 Title: Download files and run AERMET
-Version: 0.2.0
-Date: 2023-11-29
+Version: 0.3.0
+Date: 2025-01-25
 Author: James Durant
 Maintainer: James Durant to <jamesdrenda@charter.net>
 dependencies: true

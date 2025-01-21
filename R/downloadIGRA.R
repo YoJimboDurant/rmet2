@@ -65,7 +65,8 @@ downloadIGRA <- function(rmetObj, igraLoc = "https://www.ncei.noaa.gov/data/inte
   startCut <- paste(wmoName, startUTC)
   endCut <- paste(wmoName, endUTC)
   
-  tempFile <- paste(tempdir(), uaTxtFile, sep = "\\")
+  tempDir <- tempdir()
+  tempFile <- paste(tempDir, uaTxtFile, sep = "\\")
   
   unzip(igraFileLocal, exdir = tempDir)  
   
@@ -90,7 +91,12 @@ downloadIGRA <- function(rmetObj, igraLoc = "https://www.ncei.noaa.gov/data/inte
       )
     
     minLine <- min(grep( paste (wmoName, x), ua_data))
-    maxLine <- min(grep( paste (wmoName, as.numeric(x) + 1), ua_data)) - 1
+    
+    if(x == ua_years[[length(ua_years)]]){
+      maxLine <- length(ua_data)-1
+    } else {
+      maxLine <- min(grep( paste (wmoName, as.numeric(x) + 1), ua_data)) - 1
+    }
     
     ua_year_data <- ua_data[minLine:maxLine]
     
