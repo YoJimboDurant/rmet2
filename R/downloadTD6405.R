@@ -18,9 +18,11 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
     print(rmetObj$td6405_noaa)
     
     locExist <- lapply(seq_along(loc_years), function(i){
-      locFiles <- gsub (
-        paste0(getOption("rmet.noaa.site"), "asos-onemin/6405-"),
-                        "", rmetObj$td6405_noaa[[i]])
+      locFiles <- 
+        paste(loc_years[[i]], 
+              str_extract( rmetObj$td6405_noaa[[i]], 
+                           "asos-1min-pg1-[A-Za-z0-9]+-\\d{6}\\.dat"),
+              sep = "/")
       locFiles <- paste0(rmetObj$project_Dir, "/",
                          locFiles)
       print(locFiles)
@@ -30,7 +32,7 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
       locExist <- !locExist
     })
     
-    loc_years <- loc_years[unlist(lapply(locExist, all))]
+    loc_years <- loc_years[unlist(lapply(locExist, any))]
    
     lapply(seq_along(loc_years), function(i) {
       destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")

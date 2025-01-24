@@ -16,20 +16,23 @@ downloadTD6401 <- function (rmetObj, check=TRUE, ...) {
     print("Checking if files have been downloaded")
     print(rmetObj$td6401_noaa)
     
+    
     locExist <- lapply(seq_along(loc_years), function(i){
-      locFiles <- gsub (
-        paste0(getOption("rmet.noaa.site"), "asos-fivemin/6401-"),
-                        "", rmetObj$td6401_noaa[[i]])
+      locFiles <- 
+        paste(loc_years[[i]], 
+              str_extract( rmetObj$td6401_noaa[[i]], 
+                           "asos-5min-[A-Za-z0-9]+-\\d{6}\\.dat"),
+              sep = "/")
       locFiles <- paste0(rmetObj$project_Dir, "/",
                          locFiles)
       print(locFiles)
       
       locExist <- file.exists(locFiles)
+      
       locExist <- !locExist
     })
     
-    loc_years <- loc_years[unlist(lapply(locExist, all))]
-    
+    loc_years <- loc_years[unlist(lapply(locExist, any))]
  
   
     lapply(seq_along(loc_years), function(i) {
