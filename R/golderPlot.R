@@ -1,7 +1,8 @@
 #' @title golderPlot
 #' 
 #' @description
-#' \code{golderPlot} takes data frame from \code{surfReader} produces plot of surface roughness length vs. 1/Monin Obukhov Length 
+#' \code{golderPlot} takes data frame from \code{surfReader} produces plot of 
+#' surface roughness length vs. 1/Monin Obukhov Length 
 #'
 #' @export 
 

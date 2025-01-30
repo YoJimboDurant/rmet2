@@ -1,4 +1,4 @@
-#' @title csvToISD
+#' csvToISD
 #' 
 #' @description
 #' \code{csvToISD} 
@@ -6,6 +6,7 @@
 #' This function takes a data.frame read from csv formatted hourly met data from \url{https://www.ncei.noaa.gov/data/global-hourly/access/}
 #' and converts it to the ISD format detailed in \url{https://www.ncei.noaa.gov/data/global-hourly/doc/isd-format-document.pdf} 
 #' @param csvFile is data.frame read in from csv file from NCEI.
+#' @returns String vector in ISD format. 
 #' @export
 
 csvToISD <- function(csv_dfx){

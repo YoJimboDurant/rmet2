@@ -6,12 +6,83 @@
 \usage{
 \method{createInput}{rmet}(
   rmetObj,
-  type = c("aerminute", "aersurface_nws", "aermet1", "aermet2", "aermet3", "aermet23"),
+  type = c("aerminute", "aersurface_nws", "aersurface_os", "aermet1", "aermet2",
+    "aermet3", "aermet23"),
   ustar = TRUE,
   inputOps = list(S1 = list(), S2 = list(), S3 = list(other = list("THRESH_1MIN 0.5"),
     method = list("REFLEVEL SUBNWS", "STABLEBL ADJ_U*")))
 )
 }
+\arguments{
+\item{rmetObj}{an \code{rmet} class object, created by \code{createMetProject} function.}
+
+\item{type}{is vector of input files needed:
+
+  \itemize{ \item \dQuote{aerminute}.  
+ 
+ This updates \code{rmetObj$inputText$aerminute} with an AERMINUTE
+ runstream text. The function also updates \code{rmetObj$outputFiles$aerminute}
+ with the location of the .DAT output files from AERMINUTE. 
+ 
+ The \code{aerminTemplate} modifies the \code{aerminInp} template, to create input text 
+ for EPA AERMINUTE for each year of the project. The file locations of \code{rmetObj$td6405_noaa}, 
+ \code{rmetObj$td6401_noaa}, and \code{rmetObj$td3505_noaa} are scanned and 
+ the template is updated with the information in \code{rmetObj} to update. 
+ 
+ Once run, the code \code{cat(rmetObj$inputText$aerminute$xxxx)} where xxxx is the
+ year of the input file, can be used to scrutinize the input text file. 
+ 
+ If needed, the input template can be scrutinized using 
+ \code{cat(aerminTemplate, sep = "\n")}
+ 
+ \item \dQuote{aersurface_nws}
+ 
+ This creates and appends the runstream text for AERSURFACE for National Weather Service
+ Sites and appends the runstream to the \code{rmetObj}.
+ 
+ The text of the runstream is stored in \code{rmetObj$inputText$aersurface$surface}
+ and can be examined using \code{cat(rmetObj$inputText$aersurface$surface)}.  
+  
+ \item \dQuote{aersurface_os}
+ 
+ This creates and appends the runstream text for AERSURFACE for ONSITE
+ weather data and appends the runstream to the \code{rmetObj}.
+ 
+ The text of the runstream is stored in \code{rmetObj$inputText$aersurface$onsite}
+ and can be examined using \code{cat(rmetObj$inputText$aersurface$onsite)}.
+   
+ \item \dQuote{aermet1}
+ 
+ This updates \code{rmetObj$inputText$aermet$s1$xxxx} where xxxx is the year
+ of the project with runstreams for AERMET stage 1, and can be examined using 
+ \code{cat(rmetObj$inputText$aermet$s1$xxxx)}.
+ 
+ \item \dQuote{aermet23}
+ 
+ This updates \code{rmetObj$inputText$aermet$s2$xxxx} where xxxx is the year
+ of the project with runstreams for AERMET stage 2. This is combining the
+ older stages of 2 and 3 of AERMET.The input runstreat can be examined 
+ using \code{rmetObj$inputText$aermet$s1$xxxx}.
+ 
+ \item \dQuote{aermet3}
+ 
+ This is retained for backward compatibility with older projects.  
+ 
+ 
+  }}
+
+\item{ustar}{TRUE/FALSE should ustar adjustment argument be used}
+
+\item{inputOps}{list of options for stages 1, 2 and 3. Note that only
+options for stage 3 are captured at this point. \dQuote{STABLEBL ADJ_U*} must
+be present is the ustar argument is set to TRUE.}
+}
+\value{
+\code{rmet} object.
+}
 \description{
-\code{createInput}
+createInput modifies an \code{rmet} object witht the input runstreams to run
+AERMINUTE, AERSURFACE and AERMET based on the contents of the \code{rmetObj}.
+Creation of the inputs can be run individually or as a vector using the 
+\code{type} argument.
 }

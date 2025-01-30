@@ -2,7 +2,7 @@
 #' 
 #' @description
 #' \code{installAM} Function will download and unzip files from links at \url{http://www3.epa.gov/scram001/metobsdata_procaccprogs.htm}
-#' to a C: drive location. Sets a pathvariable for location of executables. The function also will create "options" for the 
+#' to a C: drive location. Sets a path variable for location of executable. The function also will create "options" for the 
 #' locations of aermet, aerminute, and aersurface executables. If these exist, subsequent functions will utilize them
 #' in deference to locally unzipped programs.
 #' @param rootDir us the directory where you want aermet, aerminute, and aersurface unpacked

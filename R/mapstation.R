@@ -12,7 +12,7 @@
 #' to be mapped from the \code{site} If no value is specified a defalt value
 #' of 25 kilometers is used.
 #' @param engine a character string to specify the mapping application to be used:
-#' \code{"leaflet"} or \code{"kml"}.
+#' \code{"leaflet"}.
 #' @importFrom magrittr %>%
 #' @export
 mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
@@ -72,17 +72,7 @@ mapstation <- function(site,farthest=25,engine="leaflet", labels = "popup") {
   }
   
   
-  # PLot stations in KML (Google Earth)
-  if(engine=="kml") {
-    sdf$size <- 5
-    sdf$colour <- "red"
-    proj4string(sdf) = CRS("+init=epsg:4326")
-    map <- plotKML::plotKML(sdf,
-                            balloon=TRUE,
-                            size=as.name("size"),
-                            colour=as.name("colour"))
-  }
-  
+ 
   map
   
 }

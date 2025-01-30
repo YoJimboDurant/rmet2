@@ -1,7 +1,7 @@
 #' @title downloadTD6405
 #' 
 #' @description
-#' \code{downloadTD6405} Boo!
+#' \code{downloadTD6405}
 #' 
 #' The function is designed to perform basic checks to make sure that 
 #' the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})

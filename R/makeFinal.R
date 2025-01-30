@@ -1,8 +1,16 @@
-#' @title makeFinal
+#' makeFinal
 #' 
 #' @description
-#' \code{makeFinal} reads the surface file output of aermet
-#'  across multiple years 
+#' \code{makeFinal} reads the surface file and profile output of aermet
+#'  across multiple years and creates a multi-year surface files. This function
+#'  works by scanning the project directory year files for .sfc and .pfl file
+#'  output and appending them together into single files and writing them at the
+#'  rmetObj project directory. 
+#'
+#' @param rmetObj A \cat{rmet} object.
+#'  
+#' @param outFilePrefix is the name of the profile and surface file. For
+#' instance, \dQuote{KFTY} will result in \dQuote{KFTY.sfc} and \dQuote{KFTY.pfl}.   
 #' @export
 #' 
 makeFinal.rmet <- function(rmetObj, outfilePrefix="outFile"){

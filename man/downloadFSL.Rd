@@ -7,7 +7,10 @@
 downloadFSL(rmetObj, ...)
 }
 \description{
-\code{downloadFSL} querries raob database at
-\url{http://www.esrl.noaa.gov/raobs/intl/GetRaobs.cgi}. 
+\code{downloadFSL} DEPRECIATED queries raob database at
+the now defunct \url{http://www.esrl.noaa.gov/raobs/intl/GetRaobs.cgi}. 
 It then places the resulting text files in subdirectories by year as .FSL files.
+}
+\seealso{
+See \code{downloadIGRA} for upper air path data download.
 }
