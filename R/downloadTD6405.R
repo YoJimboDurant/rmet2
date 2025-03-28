@@ -32,19 +32,19 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
       locExist <- !locExist
     })
     
-    loc_years <- loc_years[unlist(lapply(locExist, any))]
+    #loc_years <- loc_years[unlist(lapply(locExist, any))]
    
     lapply(seq_along(loc_years), function(i) {
-      destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
-      
-      lapply(seq_along(rmetObj$td6405[[i]]), function(j){
-        if(locExist[[i]][[j]]){
+      destDir <- paste(rmetObj$project_Dir, loc_years[[i]], 
+                       sep = "/")
+      lapply(seq_along(rmetObj$td6405[[i]]), function(j) {
+        if (locExist[[i]][[j]]) {
+          print( rmetObj$td6405[[i]][[j]])
           destFile <- paste(destDir, gsub("^.*/", "", 
-                                          rmetObj$td6405[[i]][[j]]), sep="/")
+                                          rmetObj$td6405[[i]][[j]]), sep = "/")
           download.file(rmetObj$td6405[[i]][[j]], destFile)
         }
       })
-      
     })
     
   }else{
