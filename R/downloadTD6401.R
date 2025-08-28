@@ -40,7 +40,7 @@ downloadTD6401 <- function (rmetObj, check=TRUE, ...) {
       
         lapply(seq_along(rmetObj$td6401_noaa[[i]]), function(j){
           if(locExist[[i]][[j]]){
-          print( rmetObj$td6405[[i]][[j]])
+          print( rmetObj$td6401[[i]][[j]])
           destFile <- paste(destDir, gsub("^.*/", "", 
                                           rmetObj$td6401_noaa[[i]][[j]]), sep="/")
           download.file(rmetObj$td6401[[i]][[j]], destFile)
