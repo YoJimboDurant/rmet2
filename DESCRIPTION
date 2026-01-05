@@ -38,4 +38,4 @@ Imports:
 Description: This packages uses R to automate the downloading of NOAA data and
     running US EPA's AERMET system.
 License: MIT
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

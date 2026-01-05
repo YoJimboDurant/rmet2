@@ -15,7 +15,7 @@ to be mapped from the \code{site} If no value is specified a defalt value
 of 25 kilometers is used.}
 
 \item{engine}{a character string to specify the mapping application to be used:
-\code{"leaflet"} or \code{"kml"}.}
+\code{"leaflet"}.}
 }
 \description{
 \code{mapstation} Creates a basic map with the stations around a site of interest.

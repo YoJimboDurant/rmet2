@@ -11,5 +11,7 @@ processMet(
 )
 }
 \description{
-\code{processMet} Boo!
+\code{processMet} This executes the AERMINUTE, AERSUFACE or AERMET prcoessors
+using appropriately initialized \code{rmet} object. This means that inputFiles 
+have been created (typically using \code{createInput}) and written (using \code{writeInput}).
 }

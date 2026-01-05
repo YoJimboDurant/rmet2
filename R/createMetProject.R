@@ -108,7 +108,7 @@
 #'
 #' @return An object of class \code{"rmet"} containing project metadata,
 #'   configuration settings, processing inputs/outputs, and project state.
-#' #' @examples
+#' @examples
 #' \dontrun{
 #' ## Create a new rmet project for Bloomington, Indiana (KBMG)
 #'

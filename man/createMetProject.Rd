@@ -2,7 +2,7 @@
 % Please edit documentation in R/createMetProject.R
 \name{createMetProject}
 \alias{createMetProject}
-\title{createMetProject}
+\title{Create or load an rmet meteorological project}
 \usage{
 createMetProject(
   project_Name,
@@ -49,21 +49,170 @@ createMetProject(
     ap = rep("NONAP", 12)),
   onsite_Latitude = NULL,
   onsite_Longitude = NULL,
-  onsite_Fstring = NULL
+  onsite_Fstring = NULL,
+  clobber_project = FALSE
 )
 }
+\arguments{
+\item{project_Name}{Character string giving the project name. This value is
+used to name the saved \code{.rds} project file.}
+
+\item{project_Dir}{Character string specifying the directory where the project
+will reside. Subdirectories for each year, AERSURFACE, and preprocessed data
+will be created if they do not already exist.}
+
+\item{start_Date, end_Date}{POSIXct date-time objects specifying the start and
+end of the meteorological period to be processed. Times should be supplied
+in local standard time with an explicit time zone.}
+
+\item{surf_WBAN, surf_USAF}{Character or numeric identifiers for the surface
+meteorological station. These must correspond to valid NOAA ISD station
+identifiers.}
+
+\item{surf_Call}{Character string giving the surface station call sign
+(e.g., \code{"KBMG"}).}
+
+\item{surf_Latitude, surf_Longitude}{Numeric latitude and longitude of the
+surface station in decimal degrees (NAD83/WGS84).}
+
+\item{surf_Elevation}{Numeric elevation of the surface station in meters.}
+
+\item{surf_AnenometerHeight}{Numeric height of the anemometer above ground
+level in meters.}
+
+\item{surf_UTC}{Numeric UTC offset for the surface station (e.g., \code{-5}
+for Eastern Standard Time).}
+
+\item{ifg}{Character string specifying the AERMET IFG control option
+(e.g., \code{"Y 05 25 2007"}).}
+
+\item{ua_WMO, ua_WBAN}{Deprecated identifiers for legacy FSL upper-air data.
+Retained for backward compatibility but no longer used.}
+
+\item{ua_IGRA_zip}{Character string giving the filename of the IGRA upper-air
+data archive to be used.}
+
+\item{ua_IGRA_ext}{Optional character string specifying the extracted IGRA
+data filename. If \code{NULL}, the default naming convention is used.}
+
+\item{ua_elevation}{Numeric elevation of the upper-air station in meters.}
+
+\item{ua_UTC}{Numeric UTC offset for the upper-air station.}
+
+\item{ua_Latitude, ua_Longitude}{Numeric latitude and longitude of the upper-air
+station in decimal degrees.}
+
+\item{lc_File, imp_File, cnpy_File}{Character strings giving file paths to
+land-cover, impervious surface, and canopy raster datasets used by
+AERSURFACE.}
+
+\item{lc_Type, imp_Type, cnpy_Type}{Character strings identifying the dataset
+types (e.g., \code{"NLCD2019"}, \code{"MPRV2019"}, \code{"CNPY2019"}).}
+
+\item{as_Snow}{Logical or character flag indicating whether continuous snow
+cover is assumed for AERSURFACE.}
+
+\item{as_Arid}{Logical or character flag indicating whether the site is arid
+for AERSURFACE processing.}
+
+\item{as_Moisture}{Character code specifying surface moisture conditions
+(e.g., \code{"A"} for average).}
+
+\item{as_Airport}{Logical or character flag indicating whether the site is an
+airport.}
+
+\item{as_Winter_NS, as_Winter_WS, as_Spring, as_Summer, as_Autumn}{Character strings
+specifying month groupings for seasonal land-surface characterization.}
+
+\item{as_nsector}{Deprecated numeric value specifying the number of sectors
+for AERSURFACE. Retained for backward compatibility.}
+
+\item{as_radius}{Numeric radius (in kilometers) used for AERSURFACE sector
+characterization.}
+
+\item{nws_sector, os_sector}{Data frames defining wind-direction sector
+boundaries for NWS and onsite sector configurations.}
+
+\item{onsite_Latitude, onsite_Longitude}{Optional numeric coordinates for an
+onsite meteorological station.}
+
+\item{onsite_Fstring}{Optional character string defining onsite data format
+for AERMET.}
+
+\item{clobber_project}{Logical flag controlling behavior when a project already
+exists. If \code{FALSE} (default), the existing project is loaded. If
+\code{TRUE}, the existing project object is deleted and recreated, while
+preserving downloaded data files.}
+}
+\value{
+An object of class \code{"rmet"} containing project metadata,
+  configuration settings, processing inputs/outputs, and project state.
+}
 \description{
-\code{createMetProject} Creates basic aermet project, specifying 
-the directory, surface station (surf), onsite station (on), upper air (ua) station,
-landuse data, start date and ending date.
+\code{createMetProject()} creates, loads, or recreates an \code{rmet} project
+used to prepare meteorological data for AERMET, AERMINUTE, and AERSURFACE.
 
-The function is designed to perform basic checks to make sure that 
-the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})
+The function defines project metadata, station information, land-use inputs,
+and temporal coverage, and saves the resulting project object as an \code{.rds}
+file in \code{project_Dir}.
 
-The function also uses the \code{make.names} function to save the
-rmet class object as an .rds file in the \code{project_Dir}
+If a project already exists, behavior is controlled by
+\code{clobber_project}:
+\itemize{
+  \item \code{FALSE} (default): load and return the existing project
+  \item \code{TRUE}: delete the existing project object and recreate it from
+  scratch, preserving downloaded data files
+}
+}
+\examples{
+\dontrun{
+## Create a new rmet project for Bloomington, Indiana (KBMG)
 
-This can be re-read into the R session with \code{readRDS}.
+rootDir <- "C:/rmet2/IN/KBMG"
 
-See examples for usage.
+KBMG <- createMetProject(
+  project_Name = "BMG_AP",
+  project_Dir  = rootDir,
+
+  start_Date = lubridate::mdy_hm("01/01/2019 00:00", tz = "Etc/GMT+5"),
+  end_Date   = lubridate::mdy_hm("01/31/2023 23:59", tz = "Etc/GMT+5"),
+
+  surf_WBAN   = "03893",
+  surf_USAF   = "724375",
+  surf_Call   = "KBMG",
+  surf_Latitude  = 39.14306,
+  surf_Longitude = -86.61667,
+  surf_Elevation = 257,
+  surf_AnenometerHeight = 10,
+  surf_UTC = -5,
+
+  ifg = "Y 05 25 2007",
+
+  ua_IGRA_zip = "USM00072426-data.txt.zip",
+  ua_Latitude = 39.4214,
+  ua_Longitude = -83.8217,
+  ua_elevation = 323,
+  ua_UTC = -5,
+
+  lc_File   = "path/to/land_cover.tif",
+  lc_Type   = "NLCD2019",
+  imp_File  = "path/to/impervious.tif",
+  imp_Type  = "MPRV2019",
+  cnpy_File = "path/to/canopy.tif",
+  cnpy_Type = "CNPY2019",
+
+  as_Snow     = "N",
+  as_Arid     = "N",
+  as_Moisture = "A",
+  as_Airport  = "Y",
+
+  as_Winter_NS = "3",
+  as_Winter_WS = "12 1 2",
+  as_Spring    = "4 5",
+  as_Summer    = "6 7 8",
+  as_Autumn    = "9 10",
+
+  clobber_project = FALSE
+)
+}
 }

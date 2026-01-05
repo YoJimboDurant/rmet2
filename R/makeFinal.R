@@ -7,7 +7,7 @@
 #'  output and appending them together into single files and writing them at the
 #'  rmetObj project directory. 
 #'
-#' @param rmetObj A \cat{rmet} object.
+#' @param rmetObj {An object of class \code{rmet}.}
 #'  
 #' @param outFilePrefix is the name of the profile and surface file. For
 #' instance, \dQuote{KFTY} will result in \dQuote{KFTY.sfc} and \dQuote{KFTY.pfl}.   
