@@ -2,13 +2,7 @@
 #'
 #' @description
 #' Downloads, extracts, and trims Integrated Global Radiosonde Archive (IGRA)
-#' upper-air data to match the rmet project date range. Extracted yearly
-#' files are written to the project directory and tracked in project state.
-#'
-#' @param rmetObj A valid \code{rmet} object created by \code{createMetProject()}
-#' @param igraLoc Base URL for IGRA data files
-#'
-#' @return Updated \code{rmet} object with IGRA files and state updated
+#' upper-air data to match the rmet project date range.
 #'
 #' @export
 downloadIGRA <- function(
@@ -22,127 +16,143 @@ downloadIGRA <- function(
     stop("Missing IGRA zip file argument (ua_IGRA_zip).")
   }
   
-  ## ---- initialize state node -------------------------------------------
-  if (is.null(rmetObj$state$data$igra)) {
-    rmetObj$state$data$igra <- list()
-  }
-  
+  ## ---- init state -----------------------------------------------------
+  rmetObj$state$data$igra <- rmetObj$state$data$igra %||% list()
   downloaded <- FALSE
   
-  ## ---- file paths ------------------------------------------------------
+  ## ---- paths ----------------------------------------------------------
   igraDir <- file.path(rmetObj$project_Dir, "IGRA")
   igraFileLocal  <- file.path(igraDir, rmetObj$ua_IGRA_zip)
   igraFileRemote <- paste0(igraLoc, rmetObj$ua_IGRA_zip)
   
-  ## ---- download if needed ----------------------------------------------
+  ## ---- download -------------------------------------------------------
   if (!file.exists(igraFileLocal)) {
     
-    warning("Missing IGRA file; downloading from NOAA.")
+    message("Downloading IGRA archive...")
     
-    response <- tryCatch(
-      httr::HEAD(igraFileRemote),
-      error = function(e) NULL
-    )
-    
-    if (is.null(response)) {
-      rmetObj$state$data$igra$error <- "Invalid URL or connection failure"
-      stop("Invalid IGRA URL or connection error:\n", igraFileRemote)
-    }
-    
-    if (httr::status_code(response) != 200) {
-      rmetObj$state$data$igra$error <- paste(
-        "HTTP status", httr::status_code(response)
-      )
-      stop("IGRA download failed with HTTP status ",
-           httr::status_code(response))
+    response <- tryCatch(httr::HEAD(igraFileRemote), error = function(e) NULL)
+    if (is.null(response) || httr::status_code(response) != 200) {
+      stop("IGRA download failed: ", igraFileRemote)
     }
     
     dir.create(igraDir, showWarnings = FALSE)
-    download.file(igraFileRemote, igraFileLocal, method = "curl")
+    utils::download.file(igraFileRemote, igraFileLocal, method = "libcurl")
     downloaded <- TRUE
   }
   
-  ## ---- determine extraction window ------------------------------------
-  startUTC <- format(
-    lubridate::with_tz(rmetObj$start_Date, "UTC"),
-    "%Y %m %d"
-  )
-  
-  endUTC <- format(
-    lubridate::with_tz(rmetObj$end_Date + 86400, "UTC"),
-    "%Y %m %d"
-  )
-  
-  wmoName <- paste0(
-    "#",
-    stringr::str_extract(rmetObj$ua_IGRA_zip, "^[A-Za-z0-9]+")
-  )
-  
-  uaTxtFile <- paste0(gsub("#", "", wmoName), "-data.txt")
-  
-  startCut <- paste(wmoName, startUTC)
-  endCut   <- paste(wmoName, endUTC)
-  
-  ## ---- extract ---------------------------------------------------------
-  tempDir  <- tempdir()
-  tempFile <- file.path(tempDir, uaTxtFile)
-  
-  unzip(igraFileLocal, exdir = tempDir)
-  
-  xLines <- readr::read_lines(tempFile)
-  
-  xmin <- min(grep(startCut, xLines))
-  xmax <- min(grep(endCut,   xLines))
-  
-  ua_data <- xLines[xmin:xmax]
-  
-  message(
-    "Extracting ",
-    signif(100 * length(ua_data) / length(xLines), 4),
-    "% of upper-air data."
-  )
-  
-  ## ---- split by year ---------------------------------------------------
-  ua_years <- locYears(rmetObj)
-  
-  exFiles <- lapply(ua_years, function(yy) {
+  ## ---- short-circuit if already done -----------------------------------
+  if (isTRUE(rmetObj$state$data$igra$done)) {
     
-    exFile <- file.path(
+    existing <- rmetObj$state$data$igra$files
+    
+    if (!is.null(existing) && all(file.exists(existing))) {
+      message("IGRA data already downloaded and extracted — skipping.")
+      return(rmetObj)
+    }
+    
+    message("IGRA state marked done, but files missing — reprocessing.")
+  }
+  
+  
+  ## ---- extraction window ---------------------------------------------
+  startUTC <- format(lubridate::with_tz(rmetObj$start_Date, "UTC"), "%Y %m %d")
+  endUTC   <- format(lubridate::with_tz(rmetObj$end_Date + 86400, "UTC"), "%Y %m %d")
+  
+  wmo <- stringr::str_extract(rmetObj$ua_IGRA_zip, "^[A-Za-z0-9]+")
+  wmoTag <- paste0("#", wmo)
+  uaTxtFile <- paste0(wmo, "-data.txt")
+  
+  ## ---- unzip ----------------------------------------------------------
+  tmp <- tempdir()
+  unzip(igraFileLocal, exdir = tmp)
+  txtPath <- file.path(tmp, uaTxtFile)
+  
+  if (!file.exists(txtPath)) {
+    stop("Expected IGRA text file not found after unzip: ", uaTxtFile)
+  }
+  
+  lines <- readLines(txtPath, warn = FALSE)
+  
+  ## ---- slice safely ---------------------------------------------------
+  startHits <- grep(paste(wmoTag, startUTC), lines)
+  endHits   <- grep(paste(wmoTag, endUTC),   lines)
+  
+  if (length(startHits) == 0 || length(endHits) == 0) {
+    cat("\nIGRA EXTRACTION FAILED\n")
+    cat("Station:", wmo, "\n")
+    cat("Start tag:", startUTC, "\n")
+    cat("End tag  :", endUTC, "\n")
+    cat("File preview:\n")
+    print(head(lines, 10))
+    stop("IGRA date range not found in archive.")
+  }
+  
+  ua_data <- lines[min(startHits):min(endHits)]
+  
+  .validate_igra_extract(ua_data, wmoTag)
+  
+  ## ---- split by year --------------------------------------------------
+  years <- locYears(rmetObj)
+  
+  exFiles <- vapply(years, function(yy) {
+    
+    outFile <- file.path(
       rmetObj$project_Dir,
       yy,
       paste0("igra_", yy, ".txt")
     )
     
-    minLine <- min(grep(paste(wmoName, yy), ua_data))
+    yrHits <- grep(paste(wmoTag, yy), ua_data)
+    if (length(yrHits) == 0) return(NA_character_)
     
-    if (yy == ua_years[[length(ua_years)]]) {
-      maxLine <- length(ua_data) - 1
+    endIdx <- if (yy == tail(years, 1)) {
+      length(ua_data)
     } else {
-      maxLine <- min(
-        grep(paste(wmoName, as.numeric(yy) + 1), ua_data)
-      ) - 1
+      min(grep(paste(wmoTag, as.numeric(yy) + 1), ua_data)) - 1
     }
     
-    ua_year_data <- ua_data[minLine:maxLine]
-    writeLines(ua_year_data, exFile)
+    writeLines(ua_data[min(yrHits):endIdx], outFile)
+    outFile
     
-    exFile
-  })
+  }, character(1))
   
-  ## ---- cleanup ---------------------------------------------------------
-  file.remove(tempFile)
+  exFiles <- exFiles[!is.na(exFiles)]
   
-  ## ---- update rmet object ----------------------------------------------
+  ## ---- cleanup --------------------------------------------------------
+  file.remove(txtPath)
+  
+  ## ---- update object --------------------------------------------------
   rmetObj$ua_IGRA_ext <- exFiles
   
-  ## ---- update state ----------------------------------------------------
-  rmetObj$state$data$igra$done       <- TRUE
-  rmetObj$state$data$igra$years      <- ua_years
-  rmetObj$state$data$igra$files      <- exFiles
-  rmetObj$state$data$igra$zip        <- basename(igraFileLocal)
-  rmetObj$state$data$igra$downloaded <- downloaded
-  rmetObj$state$data$igra$timestamp  <- Sys.time()
+  rmetObj$state$data$igra <- list(
+    done       = TRUE,
+    years      = years,
+    files      = exFiles,
+    zip        = basename(igraFileLocal),
+    downloaded = downloaded,
+    timestamp  = Sys.time()
+  )
   
   return(rmetObj)
+}
+
+#' Validate extracted IGRA data block
+#'
+#' @noRd
+.validate_igra_extract <- function(lines, wmoTag, min_lines = 100) {
+  
+  if (length(lines) < min_lines) {
+    stop("IGRA extract too small (", length(lines), " lines)")
+  }
+  
+  if (!any(grepl(wmoTag, lines, fixed = TRUE))) {
+    stop("IGRA extract missing station tag: ", wmoTag)
+  }
+  
+  if (any(grepl("<html>|404 Not Found", lines, ignore.case = TRUE))) {
+    stop("IGRA extract appears to contain HTML or error output")
+  }
+  
+  TRUE
 }
 

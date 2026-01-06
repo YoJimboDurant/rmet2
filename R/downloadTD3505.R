@@ -1,114 +1,163 @@
 #' @title downloadTD3505
-#' 
+#'
 #' @description
-#' \code{downloadTD3505} 
-#' 
-#' The function is designed to perform basic checks to make sure that 
-#' the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})
-#' 
+#' Downloads and prepares TD3505 (ISHD) surface meteorological data.
+#' Handles UTC year overlap correctly and trims data to project date range.
+#'
+#' @param rmetObj A valid \code{rmet} object
+#' @param check Logical; validate existing outputs before reprocessing
+#' @param ... Unused
+#'
 #' @export
-
-
-downloadTD3505 <- function (rmetObj, check=TRUE,...) {
+downloadTD3505 <- function(rmetObj, check = TRUE, ...) {
   
-  if(check){
-  print("Checking if files have been downloaded")
-  print(rmetObj$td3505_noaa)
+  stopifnot(is.rmet(rmetObj))
   
+  message("Processing TD3505 (ISHD hourly) data...")
   
+  years     <- names(rmetObj$td3505_noaa)
+  failures  <- list()
   
-  loc_years <- rmet2:::locYears(rmetObj)
-  locExist <- lapply(seq_along(loc_years), function(i){
-    locFiles <- gsub ("https://www1.ncdc.noaa.gov/pub/data/noaa/[0-9]{4}/",
-           "S", rmetObj$td3505_noaa[[i]])
-    locFiles <- substring(locFiles, 1, 14)
-    locFiles <- gsub("-", "", locFiles)
-    locFiles <- paste0(locFiles, "_", loc_years[[i]], ".ISH")
-    locFiles <- unique(locFiles)
-    locFiles <- paste0(rmetObj$project_Dir, "/",
-                       loc_years[[i]], "/", locFiles)
+  for (i in seq_along(years)) {
     
-    locExist <- file.exists(locFiles)
-    locExist <- !locExist
-  })
-  
-  loc_years <- loc_years[unlist(lapply(locExist, all))]
-
-  }
-  
-  
-  
-  #UTC timezone
-  if(rmetObj$surf_UTC < 0){
-    lapply(seq_along(loc_years), function(i) {
-      if(length(rmetObj$td3505[[i]])>1){
-        if(locExist[[i]]){
-        sourceFile <- rmetObj$td3505[[i]][[1]]
-        fileOut<-readLines(con=gzcon(url(sourceFile)))
-        
-        sourceFile2 <- rmetObj$td3505[[i]][[2]]
-        fileOut2 <- readLines(con=gzcon(url(sourceFile2)))
-        
-        UTC_endDate <- as.numeric(format(rmetObj$end_Date, "%Y%m%d%H%M", tz = "GMT"))
-        UTC_endYear <- as.numeric(paste0(as.numeric(loc_years[[i]]) + 1, "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
-        
-        UTC_startDate <- as.numeric(format(rmetObj$start_Date, "%Y%m%d%H%M", tz = "GMT"))
-        UTC_startYear <- as.numeric(paste0(as.numeric(loc_years[[i]]), "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
-        
-        indexDate <- ifelse(UTC_endDate < UTC_endYear, UTC_endDate, UTC_endYear)
-        #indexDate <- indexDate + 0000000100
-        print(as.character(indexDate))
-        indX <-  as.numeric(substring(fileOut2, 16,27)) <= indexDate
-     
-        fileOut2 <-fileOut2[indX]
-        fileOut <- c(fileOut, fileOut2)
-        
-        fileOut <- unique(fileOut)
-        indexDate <- ifelse(UTC_startDate > UTC_startYear, UTC_startDate, UTC_startYear)
-        indX <-  as.numeric(substring(fileOut, 16,27)) >= indexDate
-        fileOut <- fileOut[indX]
-
-        station_ID <- substr(fileOut[[1]], 5,15)        
-        yearDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
-        if(!dir.exists(yearDir)) dir.create(yearDir)
-        destFile <- paste0(yearDir,"/","S",station_ID,"_",loc_years[[i]], ".ISH")
-        write(fileOut, file=destFile)
-        }
-      }else{
-        if(locExist[[i]]){
-        sourceFile <- rmetObj$td3505[[i]][[1]]
-        fileOut<-readLines(con=gzcon(url(sourceFile)))
-        station_ID <- substr(fileOut[[1]], 5,15)  
-        
-        UTC_endDate <- as.numeric(format(rmetObj$end_Date, "%Y%m%d%H%M", tz = "GMT"))
-        UTC_endYear <- as.numeric(paste0(as.numeric(loc_years[[i]]) + 1, "01","01", sprintf("%02.0f", -rmetObj$surf_UTC), "00"))
-        
-        indexDate <- ifelse(UTC_endDate < UTC_endYear, UTC_endDate, UTC_endYear)
-        indX <-  as.numeric(substring(fileOut, 16,27)) <= indexDate
-        
-        yearDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
-        if(!dir.exists(yearDir)) dir.create(yearDir)
-        destFile <- paste0(yearDir,"/","S",station_ID,"_",loc_years[[i]], ".ISH")
-        write(fileOut, file=destFile)
-        }
-        
-  }
+    yr       <- years[[i]]
+    src_urls <- rmetObj$td3505_noaa[[i]]
+    yearDir  <- file.path(rmetObj$project_Dir, yr)
+    
+    if (!dir.exists(yearDir)) dir.create(yearDir, recursive = FALSE)
+    
+    destFile <- .td3505_destfile(rmetObj, yr)
+    
+    if (check && file.exists(destFile)) {
+      if (.validate_td3505_file(destFile, rmetObj$surf_Call)) {
+        next
       }
-  )
     }
+    
+    message("Building TD3505 file for year ", yr)
+    
+    out <- tryCatch(
+      .build_td3505_year(
+        urls      = src_urls,
+        year      = yr,
+        startDate = rmetObj$start_Date,
+        endDate   = rmetObj$end_Date,
+        utcOffset = rmetObj$surf_UTC
+      ),
+      error = function(e) e
+    )
+    
+    if (inherits(out, "error")) {
+      failures[[yr]] <- out$message
+      next
+    }
+    
+    writeLines(out, destFile)
+  }
   
+  ## ---- report failures ------------------------------------------------
+  if (length(failures) > 0) {
+    cat("\nTD3505 processing failures:\n")
+    for (y in names(failures)) {
+      cat("❌", y, "→", failures[[y]], "\n")
+    }
+    stop("TD3505 processing failed for one or more years.")
+  }
+  
+  ## ---- update state ---------------------------------------------------
   if (is.null(rmetObj$state$data$td3505)) {
     rmetObj$state$data$td3505 <- list()
   }
   
-  
-  rmetObj$state$data$td3505$done  <- TRUE
-  rmetObj$state$data$td3505$years <- names(rmetObj$td3505_noaa)
-  rmetObj$state$data$td3505$timestamp = Sys.time()
-  
+  rmetObj$state$data$td3505$done      <- TRUE
+  rmetObj$state$data$td3505$years     <- years
+  rmetObj$state$data$td3505$timestamp <- Sys.time()
   
   return(rmetObj)
-  
-  
 }
+
+#' Build TD3505 yearly data with UTC trimming
+#'
+#' @noRd
+.build_td3505_year <- function(urls, year, startDate, endDate, utcOffset) {
+  
+  lines <- character()
+  
+  for (u in urls) {
+    message("  reading ", basename(u))
+    lines <- c(lines, readLines(gzcon(url(u)), warn = FALSE))
+  }
+  
+  if (length(lines) == 0) stop("No data read from source files")
+  
+  ts <- as.numeric(substr(lines, 16, 27))
+  
+  startUTC <- as.numeric(format(
+    lubridate::with_tz(startDate, "UTC"), "%Y%m%d%H%M"
+  ))
+  
+  endUTC <- as.numeric(format(
+    lubridate::with_tz(endDate + 86400, "UTC"), "%Y%m%d%H%M"
+  ))
+  
+  keep <- ts >= startUTC & ts <= endUTC
+  
+  out <- unique(lines[keep])
+  
+  if (length(out) == 0) stop("No TD3505 records remain after trimming")
+  
+  out
+}
+
+#' TD3505 destination file name
+#'
+#' @noRd
+.td3505_destfile <- function(rmetObj, year) {
+  
+  station_id <- substr(
+    basename(rmetObj$td3505_noaa[[year]][[1]]),
+    1, 11
+  )
+  
+  file.path(
+    rmetObj$project_Dir,
+    year,
+    paste0("S", station_id, "_", year, ".ISH")
+  )
+}
+
+#' Validate TD3505 ISHD file
+#'
+#' @noRd
+.validate_td3505_file <- function(file, call, min_bytes = 1000) {
+  
+  fail <- function(msg) {
+    cat("\nTD3505 VALIDATION FAILED\n")
+    cat("File   :", file, "\n")
+    cat("Reason :", msg, "\n")
+    if (file.exists(file)) {
+      cat("Preview:\n")
+      print(readLines(file, n = 5))
+    }
+    FALSE
+  }
+  
+  if (!file.exists(file)) return(FALSE)
+  
+  sz <- file.size(file)
+  if (is.na(sz) || sz < min_bytes)
+    return(fail(paste("File too small:", sz)))
+  
+  hdr <- try(readLines(file, n = 10), silent = TRUE)
+  if (inherits(hdr, "try-error") || length(hdr) == 0)
+    return(fail("Unreadable or empty"))
+  
+  if (!any(grepl(call, hdr, fixed = TRUE)))
+    return(fail(paste("Station call sign not found:", call)))
+  
+  TRUE
+}
+
+
+
 

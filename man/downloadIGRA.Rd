@@ -10,16 +10,7 @@ downloadIGRA(
     "https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/access/data-por/"
 )
 }
-\arguments{
-\item{rmetObj}{A valid \code{rmet} object created by \code{createMetProject()}}
-
-\item{igraLoc}{Base URL for IGRA data files}
-}
-\value{
-Updated \code{rmet} object with IGRA files and state updated
-}
 \description{
 Downloads, extracts, and trims Integrated Global Radiosonde Archive (IGRA)
-upper-air data to match the rmet project date range. Extracted yearly
-files are written to the project directory and tracked in project state.
+upper-air data to match the rmet project date range.
 }
