@@ -1,3 +1,8 @@
+#' AERSURFACE input file template
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 "landUseValues" <- structure(list(Class.Number = c(11L, 12L, 21L, 22L, 23L, 23L, 
 31L, 31L, 32L, 33L, 41L, 42L, 43L, 51L, 51L, 61L, 71L, 81L, 82L, 
 83L, 84L, 85L, 91L, 92L), Class.Name = structure(c(11L, 14L, 

@@ -1,3 +1,8 @@
+#' LAND USE COLORS (1992)
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 nlcdLegend <- c("#000000", "#000000", "#000000", "#000000", "#000000", "#000000", 
 "#000000", "#000000", "#000000", "#000000", "#000000", "#6E7FB1", 
 "#FFFFFF", "#000000", "#000000", "#000000", "#000000", "#000000", 

@@ -1,3 +1,8 @@
+#' AERMET SURFACE FILE STRUCTURE
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 formatSfc <-
 structure(list(begin = c(0L, 3L, 6L, 11L, 13L, 16L, 23L, 30L, 
 37L, 44L, 50L, 56L, 66L, 75L, 82L, 88L, 96L, 104L, 110L, 118L, 

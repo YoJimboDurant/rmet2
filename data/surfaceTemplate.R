@@ -1,3 +1,8 @@
+#' AERSURFACE input file template
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 surfaceTemplate <-
 c("CO STARTING", "", "   TITLEONE  !TITLE1! ", "   TITLETWO  !TITLE2!", 
 "", "   DEBUGOPT  EFFRAD GRID TIFF", "", "   CENTERLL  !LAT!  !LONG!   NAD83", 

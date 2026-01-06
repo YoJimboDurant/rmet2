@@ -1,3 +1,8 @@
+#' Ice Free Wind Group Data
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 "ifwg" <- structure(list(IDENTIFIER = structure(c(20L, 29L, 33L, 43L, 46L, 
 53L, 72L, 85L, 96L, 123L, 127L, 146L, 151L, 218L, 253L, 269L, 
 270L, 285L, 337L, 384L, 385L, 421L, 454L, 457L, 459L, 460L, 481L, 

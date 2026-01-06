@@ -402,11 +402,36 @@ createMetProject <- function(
   
   ## ---- initialize state -----------------------------------------------
   aermetProject$state <- list(
-    project = list(created = TRUE),
-    data = list(),
-    processing = list(),
-    qa = list()
+    project = list(
+      created = TRUE,
+      clobbered = clobber_project,
+      created_on = Sys.time()
+    ),
+    
+    data = list(
+      td3505 = list(done = FALSE, years = NULL),
+      td6405 = list(done = FALSE, years = NULL),
+      td6401 = list(done = FALSE, years = NULL),
+      igra   = list(done = FALSE, station = ua_IGRA_zip)
+    ),
+    
+    processing = list(
+      aerminute = list(done = FALSE, years = NULL),
+      aersurface = list(done = FALSE),
+      aermet = list(
+        stage1 = list(done = FALSE),
+        stage2 = list(done = FALSE),
+        stage3 = list(done = FALSE)
+      )
+    ),
+    
+    qa = list(
+      aerminute = list(run = FALSE),
+      surface   = list(run = FALSE),
+      final     = list(run = FALSE)
+    )
   )
+  
   
   class(aermetProject) <- "rmet"
   

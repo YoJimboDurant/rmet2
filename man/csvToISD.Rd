@@ -7,7 +7,7 @@
 csvToISD(csv_dfx)
 }
 \arguments{
-\item{csvFile}{is data.frame read in from csv file from NCEI.}
+\item{csv_dfx}{is data.frame read in from csv file from NCEI.}
 }
 \value{
 String vector in ISD format.

@@ -1,3 +1,8 @@
+#' AERMINUTE input file template
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 aerminTemplate <-
 c("startend   !start_Date! !end_Date!", "ifwgroup !ifg!", "", 
 "DATAFILE STARTING", "!minFiles!", "DATAFILE FINISHED", "", "DAT5FILE STARTING", 

@@ -1,3 +1,8 @@
+#' Land Use Data
+#'
+#' Internal character vector used to generate AERMINUTE input files.
+#'
+#' @noRd
 "landuse" <- structure(list(classification = structure(c(8L, 8L, 2L, 2L, 2L, 
 1L, 1L, 1L, 3L, 3L, 3L, 7L, 6L, 4L, 5L, 5L, 5L, 5L, 5L, 9L, 9L
 ), .Label = c("Barren", "Developed", "Forrested Upland", "Herbaceous Upland", 

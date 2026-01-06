@@ -20,7 +20,7 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
     locExist <- lapply(seq_along(loc_years), function(i){
       locFiles <- 
         paste(loc_years[[i]], 
-              str_extract( rmetObj$td6405_noaa[[i]], 
+              stringr::str_extract( rmetObj$td6405_noaa[[i]], 
                            "asos-1min-pg1-[A-Za-z0-9]+-\\d{6}\\.dat"),
               sep = "/")
       locFiles <- paste0(rmetObj$project_Dir, "/",
@@ -65,7 +65,17 @@ downloadTD6405 <- function (rmetObj, check=TRUE, ...) {
     })
   }
   
+  if (is.null(rmetObj$state$data$td6405)) {
+    rmetObj$state$data$td6405 <- list()
+  }
+  
+  
+  rmetObj$state$data$td6405$done  <- TRUE
+  rmetObj$state$data$td6405$years <- names(rmetObj$td6405_noaa)
+  rmetObj$state$data$td6405$timestamp = Sys.time()
+  
         
-  return(NULL)
+  return(rmetObj)
+  
 }
 
