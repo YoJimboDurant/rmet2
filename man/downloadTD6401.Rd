@@ -2,13 +2,46 @@
 % Please edit documentation in R/downloadTD6401.R
 \name{downloadTD6401}
 \alias{downloadTD6401}
-\title{downloadTD6401}
+\title{Download and validate TD6401 ASOS 5-minute data}
 \usage{
 downloadTD6401(rmetObj, check = TRUE, ...)
 }
-\description{
-\code{downloadTD6401} 
+\arguments{
+\item{rmetObj}{An object of class \code{"rmet"} created by
+\code{createMetProject()}.}
 
-The function is designed to perform basic checks to make sure that 
-the data are valid (e.g. WBAN and USAF id's match \url{http://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt})
+\item{check}{Logical; if \code{TRUE} (default), existing files are
+validated and only re-downloaded if they fail integrity checks.
+If \code{FALSE}, all files are downloaded unconditionally.}
+
+\item{...}{Reserved for future options.}
+}
+\value{
+An updated \code{"rmet"} object with TD6401 files downloaded
+  and \code{state$data$td6401} updated.
+}
+\description{
+\code{downloadTD6401()} downloads NOAA TD6401 (ASOS 5-minute) surface
+meteorological data files required by AERMINUTE.
+
+The function verifies file integrity using lightweight checks
+(existence, minimum file size, readability, station identifiers)
+and re-downloads files that are missing or fail validation.
+
+Validation failures are reported to the console with a short file
+preview to aid debugging. If any file fails validation after download,
+the function stops with an error.
+
+Successful execution updates the project \code{state} to record
+completion time and covered years.
+}
+\details{
+TD6401 files are not fully QA'd by NOAA and may contain malformed
+records. The validation performed here is intentionally conservative
+and does not attempt to enforce strict formatting rules; detailed
+cleaning is deferred to AERMINUTE.
+}
+\seealso{
+\code{\link{downloadTD6405}}, \code{\link{downloadTD3505}},
+\code{\link{downloadIGRA}}
 }
