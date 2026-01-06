@@ -97,8 +97,18 @@ downloadTD3505 <- function (rmetObj, check=TRUE,...) {
   )
     }
   
+  if (is.null(rmetObj$state$data$td3505)) {
+    rmetObj$state$data$td3505 <- list()
+  }
   
-  return(NULL)
+  
+  rmetObj$state$data$td3505$done  <- TRUE
+  rmetObj$state$data$td3505$years <- names(rmetObj$td3505_noaa)
+  rmetObj$state$data$td3505$timestamp = Sys.time()
+  
+  
+  return(rmetObj)
+  
   
 }
 

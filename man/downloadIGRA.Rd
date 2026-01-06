@@ -11,14 +11,15 @@ downloadIGRA(
 )
 }
 \arguments{
-\item{rmetObj}{is valid rmetObject created by createMetProject}
+\item{rmetObj}{A valid \code{rmet} object created by \code{createMetProject()}}
 
-\item{igraLoc}{is the https location of the igra files. By default location is https://www.ncei.noaa.gov/data/integrated-global-radiosonde-archive/access/data-por/}
+\item{igraLoc}{Base URL for IGRA data files}
+}
+\value{
+Updated \code{rmet} object with IGRA files and state updated
 }
 \description{
-\code{downloadIGRA} 
-
-The function takes Integrated Global Radiosode Archieve (igra) zip file and extracts the zipfile and
-trims the file to match the start date and end date of the 
-study period. It adds the local file locations to the rmetObj and returns it.
+Downloads, extracts, and trims Integrated Global Radiosonde Archive (IGRA)
+upper-air data to match the rmet project date range. Extracted yearly
+files are written to the project directory and tracked in project state.
 }
