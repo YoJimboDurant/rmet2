@@ -11,12 +11,21 @@ checkTD3505 <- function(start_Date, end_Date, surf_USAF, surf_WBAN){
   years <- seq(startYear, endYear, by=1) # we actually need this to be local since minute level is local...
   loc_years <- seq(as.numeric(format(start_Date, "%Y")), as.numeric(format(end_Date, "%Y")))
 
+  if(grepl("amazonaws", noaaSite)){
+    fileName <- sapply(seq_along(years), function(i){
+      paste0(
+        noaaSite, years[i], "/", paste(surf_USAF, surf_WBAN, years[i], sep="-"), 
+        ".gz")
+    })
+    
+    
+  }else{
     fileName <- sapply(seq_along(years), function(i){
       paste0(
         noaaSite, "noaa/", years[i], "/", paste(surf_USAF, surf_WBAN, years[i], sep="-"), 
         ".gz")
     })
-
+}
     checkTD3505 <- NULL
     for(i in 1:length(fileName))function(x){
       

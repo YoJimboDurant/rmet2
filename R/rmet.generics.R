@@ -190,7 +190,8 @@ summary.rmet <- function(object, ...) {
   cat("  TD3505   :", if (st$data$td3505$done) "✓" else "✗", "\n")
   cat("  TD6405   :", if (st$data$td6405$done) "✓" else "✗", "\n")
   cat("  TD6401   :", if (st$data$td6401$done) "✓" else "✗", "\n")
-  cat("  IGRA     :", if (st$data$igra$done)   "✓" else "✗", "\n\n")
+  cat("  IGRA     :", if (st$data$igra$done)   "✓" else "✗", "\n")
+  cat("  NCLD     :", if (st$aersurface_nlcd)   "✓" else "✗", "\n\n")
   
   cat("Processing:\n")
   cat("  AERMINUTE:", if (st$processing$aerminute$done) "✓" else "✗", "\n")

@@ -211,7 +211,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
           
           if(!is.null(rmetObj$td3505_noaa[[i]])){
             destDir <- paste(rmetObj$project_Dir, loc_years[[i]], sep="/")
-            hourFile <- paste0(destDir, "/S", rmetObj$surf_USAF, 
+            hourFile <- paste0(destDir, "/S", rmetObj$surf_USAF, "-", 
                                rmetObj$surf_WBAN,
                                 "_",loc_years[[i]], ".ISH")
             hourFile <-prepareThePath(hourFile)

@@ -116,7 +116,7 @@ downloadTD3505 <- function(rmetObj, check = TRUE, ...) {
   
   station_id <- substr(
     basename(rmetObj$td3505_noaa[[year]][[1]]),
-    1, 11
+    1, 12
   )
   
   file.path(

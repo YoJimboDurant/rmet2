@@ -1,10 +1,10 @@
 .onLoad <- function(libname, pkgname) {
   op <- options()
   op.rmet <- list(
-    rmet.noaa.site = "https://www1.ncdc.noaa.gov/pub/data/",
+    rmet.noaa.site = "https://noaa-isd-pds.s3.amazonaws.com/data/",
     rmet.noaa.1min = "https://www.ncei.noaa.gov/data/automated-surface-observing-system-one-minute-pg1/access/",
     rmet.noaa.5min = "https://www.ncei.noaa.gov/data/automated-surface-observing-system-five-minute/access/",
-    rmet.noaa.surfhist = "https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.txt",
+    rmet.noaa.surfhist = "https://noaa-isd-pds.s3.amazonaws.com/isd-history.txt",
     rmet.install.args = "",
     rmet.name = "rmet",
     rmet.desc.author = '"James Durant <hzd3@cdc.gov> [aut, cre]"',
@@ -30,7 +30,7 @@
                         current rmet options are set to:\n")
   
   print(sapply(grep("rmet", names(options()), value=TRUE), getOption))
-  try(rmet2:::readisd())
+  try(rmet2:::readisd("https://noaa-isd-pds.s3.amazonaws.com/isd-history.txt"))
   # if("surf_Hist" %in% ls (envir = rmetData)){
   #   print(paste("Surface File History File Loaded from", getOption("rmet.noaa.surfhist")))
   # }else{
