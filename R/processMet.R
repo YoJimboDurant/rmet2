@@ -29,9 +29,11 @@ processMet <- function(rmetObj, processor = c("aerminute", "aersurface", "aermet
     tmp <- sapply(moveFiles, function(x) file.rename(x, paste(rmetObj$project_Dir,
                                                               locYears(rmetObj)[[i]], x, 
                                                               sep="/")))
+
     
-  }
-  )
+      }
+    )
+    rmetObj$state$processing$aerminute$done <- TRUE
   }
   
   if ("aersurface" %in% processor) {

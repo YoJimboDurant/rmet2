@@ -199,6 +199,13 @@ summary.rmet <- function(object, ...) {
   cat("  AERMET:\n")
   cat("    Stage 1:", if (st$processing$aermet$stage1$done) "✓" else "✗", "\n")
   cat("    Stage 2:", if (st$processing$aermet$stage2$done) "✓" else "✗", "\n")
-  cat("    Stage 3:", if (st$processing$aermet$stage3$done) "✓" else "✗", "\n")
+  cat("    Stage 3:", if (st$processing$aermet$stage3$done) "✓" else "✗", "\n\n")
+  
+  cat("QA:\n")
+  cat("  AERMINUTE CHECK:\n")
+  cat("     Execution:", st$qa$aerminute$qa_status$execution, "\n")
+  cat("     Structural:", st$qa$aerminute$qa_status$structural, "\n")
+  cat("     Reasonableness:", st$qa$aerminute$qa_status$structural, "\n")
+  
 }
 
