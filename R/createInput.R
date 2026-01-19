@@ -125,7 +125,7 @@ createInput.rmet <- function(rmetObj, type=c("aerminute", "aersurface_nws",
     
   uaexoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAEXOUT.DAT", sep="/")
   uaqaoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "UAQAOUT.DAT", sep="/")
-  stationID <- paste0(rmetObj$surf_USAF, rmetObj$surf_WBAN)
+  stationID <- paste(rmetObj$surf_USAF, rmetObj$surf_WBAN, sep = "-")
   ishFiles <- paste0(path.expand(rmetObj$project_Dir), "/", loc_years,"/","S",stationID,"_",loc_years, ".ISH")
   ishqaoutFiles <- paste(path.expand(rmetObj$project_Dir), loc_years, "SFQAOUT.DAT", sep="/")
   destDir <- paste(path.expand(rmetObj$project_Dir), loc_years, sep="/")
